@@ -15,9 +15,14 @@ applications/<Company>_<Role>/     One folder per job, holding generated artifac
   ├── gap-report.md                  weighted match score + prioritized edits
   ├── resume-tailored.tex            master + approved, content-only edits
   └── resume-tailored.pdf            compiled output
+interview-prep/                    Global, repo-wide study dashboard (not job-specific):
+  ├── topics/<slug>.md               one per topic (derived from keywords + gaps)
+  ├── notes/<slug>.md                one per note (from a URL or local doc)
+  └── index.html                     generated self-contained SPA (gitignored)
 skills/
   ├── install.sh                     symlinks skills/* into ~/.claude/skills
-  └── tailor-application/            the skill (SKILL.md + scripts/)
+  ├── tailor-application/            resume↔job tailoring skill
+  └── interview-prep/                interview-prep dashboard + notes skill
 ```
 
 ## Setup
@@ -66,3 +71,30 @@ bash skills/tailor-application/scripts/compile-resume.sh \
 
 The compile script auto-installs any missing LaTeX packages via `tlmgr` and warns
 if the result spills past one page.
+
+## Interview prep
+
+A second skill, `interview-prep`, builds a single self-contained SPA
+(`interview-prep/index.html`) for interview study. One skill, two modes:
+
+- **Build / refresh** — derives topics from all `applications/*/keywords.md` +
+  gap reports (ranked must-have → gap → frequency), sources official docs
+  (Context7 first, WebSearch+Fetch fallback), and writes doc-grounded prep per
+  topic: 80/20 core concepts + likely Q&A + "say it with your resume" hooks.
+- **Add a note** — point it at a public URL or local doc; it 80/20-distills the
+  source into a note section.
+
+In Claude Code:
+
+> Build my interview prep dashboard
+> Add a note from https://…
+
+Each `.md` lives under `interview-prep/`; the build renders them to one HTML page:
+
+```bash
+python3 skills/interview-prep/scripts/build.py interview-prep
+open interview-prep/index.html
+```
+
+Refreshes are **additive** — new topics are added, hand-edited files and notes
+are never clobbered (tracked via a `generated:` frontmatter flag).

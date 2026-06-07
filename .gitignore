@@ -14,3 +14,6 @@
 
 # macOS
 .DS_Store
+
+# interview-prep generated dashboard
+interview-prep/index.html
