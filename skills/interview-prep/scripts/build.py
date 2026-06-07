@@ -106,6 +106,16 @@ code{background:#0d1117;padding:2px 6px;border-radius:5px;font-size:13px}
 pre{background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
 pre code{padding:0;background:none}
 blockquote{border-left:3px solid var(--accent);margin:0;padding:2px 16px;color:var(--muted)}
+details{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:rgba(255,255,255,.02)}
+details>summary{cursor:pointer;padding:11px 16px;font-weight:600;color:#fff;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"\\25B8  ";color:var(--accent);font-weight:700}
+details[open]>summary::before{content:"\\25BE  "}
+details[open]>summary{border-bottom:1px solid var(--line)}
+details>summary:hover{background:rgba(77,163,255,.06)}
+details>*:not(summary){padding-left:16px;padding-right:16px}
+details>*:last-child{padding-bottom:12px}
+.qcount{color:var(--muted);font-size:12px;margin:-6px 0 14px}
 .empty{color:var(--muted);margin-top:40px}
 """
 

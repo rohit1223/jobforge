@@ -75,14 +75,19 @@ if the result spills past one page.
 ## Interview prep
 
 A second skill, `interview-prep`, builds a single self-contained SPA
-(`interview-prep/index.html`) for interview study. One skill, two modes:
+(`interview-prep/index.html`) for **senior-level revision of topics you can
+defend**. One skill, two modes:
 
-- **Build / refresh** — derives topics from all `applications/*/keywords.md` +
-  gap reports (ranked must-have → gap → frequency), sources official docs
-  (Context7 first, WebSearch+Fetch fallback), and writes doc-grounded prep per
-  topic: 80/20 core concepts + likely Q&A + "say it with your resume" hooks.
+- **Build / refresh** — derives matched, resume-proven topics (JD-required
+  first), sources official docs (Context7 first, WebSearch+Fetch fallback), and
+  writes deep prep per topic: senior mental-model concepts (internals,
+  trade-offs, failure modes, tuning) + 10–15 seniority-calibrated interview
+  questions as a **click-to-reveal self-quiz** + "say it with your resume" hooks.
 - **Add a note** — point it at a public URL or local doc; it 80/20-distills the
   source into a note section.
+
+Pure gaps (tools you haven't used) are intentionally out of scope here — that's
+a future topic-learning mode.
 
 In Claude Code:
 
