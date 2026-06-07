@@ -1,0 +1,179 @@
+%-------------------------
+% Resume in Latex
+% Adapted to match the requested template style
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage[scale=0.90,lf]{FiraMono}
+\usepackage{contour}
+\usepackage[normalem]{ulem}
+\usepackage[T1]{fontenc}
+\usepackage{tgheros}
+
+\definecolor{light-grey}{gray}{0.83}
+\definecolor{dark-grey}{gray}{0.3}
+\definecolor{text-grey}{gray}{.08}
+
+\DeclareRobustCommand{\ebseries}{\fontseries{eb}\selectfont}
+\DeclareTextFontCommand{\texteb}{\ebseries}
+
+\renewcommand{\ULdepth}{1.8pt}
+\contourlength{0.8pt}
+\newcommand{\myuline}[1]{%
+  \uline{\phantom{#1}}%
+  \llap{\contour{white}{#1}}%
+}
+
+\renewcommand*\familydefault{\sfdefault}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{0in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+    \bfseries \vspace{2pt} \raggedright \large
+}{}{0em}{}[\color{light-grey}{\titlerule[2pt]} \vspace{-4pt}]
+
+\newcommand{\resumeItem}[1]{
+  \item\small{{#1 \vspace{-1pt}}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & {\color{dark-grey}\small #2}\vspace{1pt}\\
+      \textit{#3} & {\color{dark-grey}\small #4}\\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      #1 & {\color{dark-grey} #2}\\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=18pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{0pt}}
+
+\color{text-grey}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge Rohit Kumar} \\ \vspace{5pt}
+    \small \faPhone*\ \texttt{+91-8904958955} \hspace{1pt} $|$
+    \hspace{1pt} \faEnvelope\ \texttt{rohit.k.1223@gmail.com} \hspace{1pt} $|$
+    \hspace{1pt} \faLinkedin\ \href{https://www.linkedin.com/in/rohit5876}{\texttt{@rohit5876}} \hspace{1pt} $|$
+    \hspace{1pt} \faGithub\ \href{https://github.com/rohit1223}{\texttt{@rohit1223}} \hspace{1pt} \\ \vspace{-3pt}
+\end{center}
+
+%-----------SUMMARY-----------
+\section{SUMMARY}
+\begin{itemize}[leftmargin=0in, label={}]
+    \small{\item{Software and platform engineer with 9+ years of experience building cloud infrastructure, control planes, internal developer platforms, and AI-assisted operations tooling in large-scale enterprise environments. Proven track record of turning operational bottlenecks into durable engineering systems, including compressing cloud region launch timelines from \textbf{30 days to 8 hours}, lowering state-tier infrastructure usage by \textbf{68.4\%}, and removing recurring on-call toil through automation and self-service. Deep expertise across distributed systems, infrastructure automation, reliability engineering, API design, backend services, and incident tooling, with strong ownership of high-stakes production initiatives.}}
+\end{itemize}
+
+%-----------SKILLS-----------
+\section{SKILLS}
+\begin{itemize}[leftmargin=0in, label={}]
+    \small{\item{
+     \textbf{Languages} {: Java, Python, Shell Scripting} \\
+     \textbf{Cloud} {: Oracle Cloud Infrastructure (OCI), AWS, Terraform} \\
+     \textbf{Infrastructure As Code} {: Ansible, Chef, Docker, Kubernetes, Jenkins, Linux, Git} \\
+     \textbf{Backend \& Platform} {: REST APIs, distributed systems, control planes, Redis, SQL, infrastructure automation, reliability engineering, incident tooling} \\
+     \textbf{Monitoring} {: Grafana, MQL, JQL, Datadog} \\
+     \textbf{AI \& Search Systems} {: RAG, vector search, BM25, Lucene, embeddings, agentic workflows}
+    }}
+\end{itemize}
+
+%-----------EXPERIENCE-----------
+\section{EXPERIENCE}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {Oracle India Development Center}{2020 -- Present}
+      {Member of Technical Staff}{India}
+      \resumeItemListStart
+        \resumeItem{Reduced OCI API Gateway new-region and new-realm build time from \textbf{30 days to 8 hours} by redesigning the build workflow, replacing ticket-driven dependencies with Terraform-based automation, and streamlining policy serialization and tenancy-aware provisioning.}
+        \resumeItem{Led ARM adoption and mixed-shape platform validation across \textbf{34 production regions in 4 rollout phases}, enabling API Gateway services to run across x86 and ARM while addressing capacity bottlenecks through performance testing, shard sizing, and staged production rollout.}
+        \resumeItem{Cut state-tier capacity footprint by \textbf{68.4\% in OC1}, eliminating \textbf{357 cores} and reducing large-region usage from \textbf{63 OCPUs to 18 OCPUs per region}, by building an 8-step automated live-migration workflow for Redis-based state services with strict sequencing, health checks, and production guardrails.}
+        \resumeItem{Re-architected the Orchestrator admin plane with a production-ready V2 API surface spanning \textbf{16 named resources}, modernized pagination and query behavior, decoupled API contracts from persistence through a DTO layer, and enabled parallel V1/V2 migration without underlying data-model changes.}
+        \resumeItem{Cut access- and setup-related on-call pages from \textbf{10+ per week per UK--India shift to 0} by exposing secure public management APIs, removing tunnel dependencies, and enforcing tenant validation, RBAC, IP-based restrictions, and mTLS ingress.}
+        \resumeItem{Built an internal operations copilot for runbooks, documentation, PDFs, HTML, tables, and multi-team knowledge bases, keeping retrieval latency \textbf{under 9 seconds} and reducing indexing time from \textbf{hours to minutes} through hybrid BM25/vector search, citation-aware responses, batch embeddings, and incremental indexing.}
+        \resumeItem{Saved \textbf{203.5 engineering hours} within API Gateway and improved incident resolution time by \textbf{20\%} by automating Jira alarm-context enrichment across \textbf{2,442 tickets}; onboarded \textbf{6 teams} to the workflow.}
+        \resumeItem{Saved approximately \textbf{240 developer hours per month} across \textbf{15 teams} by launching an AI-assisted weekly operations reporting pipeline that clusters incidents, summarizes recurring themes, generates HTML reports, and publishes standardized outputs automatically.}
+        \resumeItem{Modernized the API Gateway performance-testing stack by migrating the entire suite from legacy Canary to Test Service, upgrading to \textbf{Java 21} and a new testing framework, and building the supporting infrastructure; retired legacy instances, resolved recurring security-review findings, and avoided more than \textbf{300 security tickets} across \textbf{34 production regions}.}
+      \resumeItemListEnd
+
+    \newpage
+
+    \resumeSubheading
+      {UnitedHealth Group}{2017 -- 2020}
+      {IO Engineering Analyst}{India}
+      \resumeItemListStart
+        \resumeItem{Automated end-to-end Pega installation with Python and shell scripting, cutting per-server setup time from \textbf{11 hours to 30 minutes} and removing approximately \textbf{95\%} of manual effort; recognized with the \textbf{Aquamarine Bravo Award for Innovation}.}
+        \resumeItem{Built customized containerized Pega images on JBoss and Tomcat with MySQL for OpenShift deployment, advancing the platform's containerization strategy and enabling repeatable environment provisioning.}
+        \resumeItem{Designed and deployed a three-tier high-availability web application using Apache HTTPD, Tomcat, and Prevayler, with auto-scaling and configuration management delivered through Docker, Docker Swarm, and Ansible.}
+        \resumeItem{Saved \textbf{more than 30 hours of manual work per month} by automating certificate rotation, renewal notifications, and roll-out workflows with Ansible and Python.}
+        \resumeItem{Cut go-live environment validation time by \textbf{2.5 hours per environment} by automating health checks across JBoss, WebSphere, and IHS with shell scripts that generated spreadsheet-based readiness reports.}
+      \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------KEY ACHIEVEMENTS-----------
+\section{KEY ACHIEVEMENTS}
+\resumeSubHeadingListStart
+  \item[]
+    \resumeItemListStart
+      \resumeItem{Scaled Ops Copilot from a passion project into a senior-leadership-recognized operations platform adopted by \textbf{15 teams}, driving \textbf{hundreds of hours of monthly time savings} through AI-assisted troubleshooting, ticket enrichment, and reporting automation.}
+      \resumeItem{Turned an API Gateway Catalog proof of concept into the foundation for a broader API Developer Portal initiative, strengthening internal developer enablement and platform self-service.}
+      \resumeItem{Recognized with UnitedHealth Group's \textbf{Aquamarine Bravo Award for Innovation} for building a repeatable Pega installation workflow that replaced a lengthy manual process with fast, standardized server provisioning.}
+    \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{EDUCATION}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {Dayananda Sagar College of Engineering}{2013 -- 2017}
+      {B.E. in Information Science}{Bengaluru, India}
+\resumeSubHeadingListEnd
+
+%-------------------------------------------
+\end{document}
