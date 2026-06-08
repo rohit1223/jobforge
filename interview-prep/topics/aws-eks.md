@@ -4,6 +4,7 @@ bucket: tech
 must: true
 rank: 1
 sources: https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+depth: standard
 generated: true
 ---
 

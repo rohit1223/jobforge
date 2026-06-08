@@ -4,6 +4,7 @@ bucket: tech
 must: true
 rank: 3
 sources: https://kubernetes.io/docs/concepts/
+depth: standard
 generated: true
 ---
 

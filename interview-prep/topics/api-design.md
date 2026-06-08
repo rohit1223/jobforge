@@ -4,6 +4,7 @@ bucket: tech
 must: false
 rank: 7
 sources: https://cloud.google.com/apis/design
+depth: standard
 generated: true
 ---
 

@@ -4,6 +4,7 @@ bucket: tech
 must: false
 rank: 10
 sources: https://docs.oracle.com/en/java/javase/21/
+depth: standard
 generated: true
 ---
 

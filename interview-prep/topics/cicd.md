@@ -4,6 +4,7 @@ bucket: tech
 must: true
 rank: 4
 sources: https://www.jenkins.io/doc/
+depth: standard
 generated: true
 ---
 

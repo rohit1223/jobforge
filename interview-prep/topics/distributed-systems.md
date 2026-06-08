@@ -4,6 +4,7 @@ bucket: tech
 must: false
 rank: 6
 sources: https://aws.amazon.com/builders-library/
+depth: standard
 generated: true
 ---
 

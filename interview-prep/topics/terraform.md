@@ -5,6 +5,7 @@ must: true
 gap: false
 rank: 2
 sources: https://developer.hashicorp.com/terraform/docs
+depth: standard
 generated: true
 ---
 

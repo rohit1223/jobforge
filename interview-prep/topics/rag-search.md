@@ -4,6 +4,7 @@ bucket: tech
 must: false
 rank: 9
 sources: https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html
+depth: standard
 generated: true
 ---
 

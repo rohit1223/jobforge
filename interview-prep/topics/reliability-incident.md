@@ -4,6 +4,7 @@ bucket: tech
 must: false
 rank: 8
 sources: https://sre.google/sre-book/table-of-contents/
+depth: standard
 generated: true
 ---
 

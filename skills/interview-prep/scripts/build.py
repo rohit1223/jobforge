@@ -16,6 +16,8 @@ import subprocess
 import sys
 
 DATADIR = sys.argv[1] if len(sys.argv) > 1 else "interview-prep"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+GUIDE_PATH = os.path.join(os.path.dirname(SCRIPT_DIR), "USAGE.md")  # skills/interview-prep/USAGE.md
 
 
 def parse_frontmatter(text):
@@ -76,8 +78,11 @@ def badge(it):
     out = ""
     if truthy(m.get("must")):
         out += '<span class="badge must">must</span>'
-    if truthy(m.get("gap")):
-        out += '<span class="badge gap">gap</span>'
+    if truthy(m.get("learning")):
+        out += '<span class="badge learning">learning</span>'
+    d = (m.get("depth") or "").strip().lower()
+    if d in ("quick", "standard", "deep"):
+        out += f'<span class="badge depth {d}">{d}</span>'
     return out
 
 
@@ -95,6 +100,13 @@ nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);col
 .badge{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:6px;letter-spacing:.04em}
 .badge.must{background:rgba(61,220,151,.16);color:var(--must)}
 .badge.gap{background:rgba(255,122,89,.16);color:var(--gap)}
+.badge.learning{background:rgba(255,184,77,.16);color:#ffb84d}
+.badge.depth{background:rgba(139,149,163,.14);color:var(--muted)}
+.badge.depth.deep{background:rgba(199,146,234,.16);color:#c792ea}
+.badge.depth.quick{background:rgba(127,209,255,.14);color:#7fd1ff}
+nav span.suggest{display:block;padding:6px 18px;color:var(--muted);font-size:13px;font-style:italic;cursor:default}
+nav span.suggest small{display:block;font-style:normal;font-size:11px;opacity:.75}
+.guide-cmd{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#7fd1ff}
 #search{width:calc(100% - 36px);margin:0 18px 8px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#0d1117;color:var(--fg)}
 main{flex:1;height:100vh;overflow-y:auto;padding:40px 56px;max-width:900px}
 .pane{display:none}.pane.active{display:block;animation:f .15s ease}
@@ -136,11 +148,39 @@ if(first)show(first);
 """
 
 
+def read_suggested():
+    """Parse <datadir>/suggested.md lines like '- Title — why' into (title, why)."""
+    path = os.path.join(DATADIR, "suggested.md")
+    items = []
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("- "):
+                    rest = line[2:].strip().lstrip("*").rstrip("*").strip()
+                    for sep in (" — ", " -- ", " - ", ": "):
+                        if sep in rest:
+                            title, why = rest.split(sep, 1)
+                            break
+                    else:
+                        title, why = rest, ""
+                    items.append((title.strip().strip("*"), why.strip()))
+    return items
+
+
 def build():
     topics = sorted(collect("topics"), key=topic_key)
     notes = sorted(collect("notes"), key=lambda it: it["meta"]["title"].lower())
+    suggested = read_suggested()
 
     nav, panes = [], []
+
+    # Pinned guide pane (rendered from skills/interview-prep/USAGE.md), shown first.
+    if os.path.isfile(GUIDE_PATH):
+        with open(GUIDE_PATH, encoding="utf-8") as f:
+            _, guide_body = parse_frontmatter(f.read())
+        nav.append('<nav><a data-target="guide">ℹ️  How to use</a></nav>')
+        panes.append(f'<section class="pane" id="guide">{md_to_html(guide_body)}</section>')
 
     def emit(group, items):
         nonlocal nav, panes
@@ -163,6 +203,13 @@ def build():
 
     emit("Topics", topics)
     emit("Notes", notes)
+
+    # Suggested-but-not-generated group: muted, non-clickable.
+    if suggested:
+        nav.append('<div class="group">Suggested · not generated</div>')
+        for title, why in suggested:
+            why_html = f"<small>{html.escape(why)}</small>" if why else ""
+            nav.append(f'<span class="suggest" title="{html.escape(why)}">{html.escape(title)}{why_html}</span>')
 
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)

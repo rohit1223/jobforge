@@ -1,6 +1,6 @@
 ---
 name: interview-prep
-description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can already defend, drawn from your resume and the matched keywords of job gap reports. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and 10-15 seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Also adds study notes from URLs or local docs. Use when the user wants to revise/prep for interviews, deepen topic mastery, build a study dashboard, or add a note from a link/document.
+description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Three modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], and add-note. Use when the user wants to revise/prep for interviews, deepen or explore a topic, build a study dashboard, or add a note from a link/document. See USAGE.md for the user-facing guide.
 ---
 
 # interview-prep
@@ -19,16 +19,30 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
   └── index.html         # generated build artifact (gitignored)
   ```
 - **Build:** `python3 skills/interview-prep/scripts/build.py interview-prep` renders every `.md` (via `pandoc`) into one self-contained `index.html` (inline CSS/JS, sidebar nav, collapsible Q&A). Run it after any `.md` change.
-- **Topic frontmatter:** `title`, `bucket` (tech/soft/experience/domain), `must` (bool — JD-required, floats to top), `rank` (int; lower = higher), `sources` (url), `generated` (bool — `true` until a human edits it).
+- **Topic frontmatter:** `title`, `bucket` (tech/soft/experience/domain), `must` (bool — JD-required, floats to top), `learning` (bool — a topic you can't yet fully defend; shows a "learning" badge), `depth` (`quick`/`standard`/`deep`), `rank` (int; lower = higher), `sources` (url), `generated` (bool — `true` until a human edits it).
 - **Note frontmatter:** `title`, `source` (url/path), `added` (YYYY-MM-DD), `generated: true`.
+- **Suggested backlog:** `interview-prep/suggested.md` — a ranked markdown list `- Title — one-line why` of matched topics not yet generated. The build renders it as a muted "Suggested · not generated" sidebar group; Mode 1 maintains it.
+- **Depth tiers** (control concept richness + question count + number of doc fetches):
+  | tier | questions | concepts | fetches |
+  |---|---|---|---|
+  | `quick` | ~5 | core mechanism + top trade-off | 1 |
+  | `standard` *(default)* | 10–15 | full senior mental-model | 1–2 |
+  | `deep` | ~20–25 | exhaustive + code + multiple design prompts | several |
 
-## Mode 1 — build / refresh the dashboard
+## Mode 1 — build / refresh the dashboard  (throttled)
 
-1. **Derive matched topics.** Scan all `applications/*/keywords.md` + `gap-report.md` and `master/resume.tex`. Select only topics the **resume genuinely demonstrates** (skip pure gaps). Rank **JD-must-have first, then resume strength / cross-job frequency.**
-2. **Skip existing** topic files unless `--refresh <slug>` is given (see Safety).
-3. **Source official docs** for each topic — see **Doc sourcing**. Record the URL in `sources`.
-4. **Write `topics/<slug>.md`** (`generated: true`) using the **deep content template** below.
-5. **Rebuild:** run `build.py`, then give the user the path to open `interview-prep/index.html`.
+1. **Derive matched topics.** Scan all `applications/*/keywords.md` + `gap-report.md` and `master/resume.tex`. Select only topics the **resume genuinely demonstrates** (skip pure gaps — those are Mode 2). Rank **JD-must-have first, then resume strength / cross-job frequency.**
+2. **Throttle: generate only the top ~3 not-yet-built topics** this run (default 3; honour `--count N` if given). This avoids doc-fetch rate-limits — do NOT fetch all topics at once.
+3. **Write the rest to `suggested.md`** as a ranked `- Title — one-line why` list (skip ones already in `topics/`). 
+4. **Source official docs** for each generated topic — see **Doc sourcing**. Use `standard` depth. Record the URL in `sources`; set `depth: standard`.
+5. **Write `topics/<slug>.md`** (`generated: true`) using the **deep content template** below. Skip existing files unless `--refresh <slug>`.
+6. **Rebuild** (`build.py`), then tell the user: the path to open, the ~3 topics generated, and the **suggested next** topics (re-run Mode 1 for the next ~3, or `add-topic <name>` for a specific one).
+
+## Mode 3 — add a topic on demand  (`add-topic <topic> [--depth=quick|standard|deep]`)
+
+1. Generate **one named topic** — matched OR a gap you want to learn — at the requested depth (default `standard`; see the depth-tier table above for what each controls).
+2. **Source official docs** per **Doc sourcing**, scaling fetch breadth to depth. Write `topics/<slug>.md` (`generated: true`, `depth: <tier>`). If the resume can't yet defend it, set `learning: true` (and omit `must`). Remove it from `suggested.md` if present.
+3. **Rebuild** with `build.py`. Not throttled — this is an explicit single topic.
 
 ### Deep content template (this is the quality bar — not an overview)
 
