@@ -12,8 +12,13 @@ Usage: python3 build.py [datadir]   (datadir defaults to "interview-prep")
 import glob
 import html
 import os
+import re
 import subprocess
 import sys
+
+
+def slugify(s):
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "topic"
 
 DATADIR = sys.argv[1] if len(sys.argv) > 1 else "interview-prep"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -104,9 +109,13 @@ nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);col
 .badge.depth{background:rgba(139,149,163,.14);color:var(--muted)}
 .badge.depth.deep{background:rgba(199,146,234,.16);color:#c792ea}
 .badge.depth.quick{background:rgba(127,209,255,.14);color:#7fd1ff}
-nav span.suggest{display:block;padding:6px 18px;color:var(--muted);font-size:13px;font-style:italic;cursor:default}
-nav span.suggest small{display:block;font-style:normal;font-size:11px;opacity:.75}
-.guide-cmd{background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#7fd1ff}
+nav.suggested{counter-reset:sg}
+nav.suggested a{align-items:center}
+nav.suggested a::before{counter-increment:sg;content:counter(sg);flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid var(--line);border-radius:50%;font-size:10px;color:var(--muted)}
+.prompt{display:flex;align-items:center;gap:8px;background:#0d1117;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0 16px}
+.prompt code{flex:1;background:none;color:#7fd1ff;font-size:13px;padding:0;word-break:break-all}
+.prompt button.copy{flex:none;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:5px 11px;font-size:12px}
+.prompt button.copy:hover{background:rgba(77,163,255,.12);border-color:var(--accent)}
 #search{width:calc(100% - 36px);margin:0 18px 8px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#0d1117;color:var(--fg)}
 main{flex:1;height:100vh;overflow-y:auto;padding:40px 56px;max-width:900px}
 .pane{display:none}.pane.active{display:block;animation:f .15s ease}
@@ -145,6 +154,10 @@ if(search)search.addEventListener('input',()=>{const q=search.value.toLowerCase(
   links.forEach(a=>a.style.display=a.textContent.toLowerCase().includes(q)?'':'none')});
 const first=(location.hash&&document.getElementById(location.hash.slice(1)))?location.hash.slice(1):(panes[0]&&panes[0].id);
 if(first)show(first);
+function copyEl(id,btn){var el=document.getElementById(id);if(!el)return;var text=el.textContent;
+  var done=function(){var o=btn.textContent;btn.textContent='✓ Copied';setTimeout(function(){btn.textContent=o},1200)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){fbCopy(text,done)})}else{fbCopy(text,done)}}
+function fbCopy(text,done){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(ta);done()}
 """
 
 
@@ -204,12 +217,32 @@ def build():
     emit("Topics", topics)
     emit("Notes", notes)
 
-    # Suggested-but-not-generated group: muted, non-clickable.
-    if suggested:
-        nav.append('<div class="group">Suggested · not generated</div>')
-        for title, why in suggested:
-            why_html = f"<small>{html.escape(why)}</small>" if why else ""
-            nav.append(f'<span class="suggest" title="{html.escape(why)}">{html.escape(title)}{why_html}</span>')
+    # Suggested-but-not-generated group: ordered, clickable; each opens a pane
+    # with the exact copy-able prompt. Auto-dropped once that topic is generated.
+    existing = {it["slug"] for it in topics} | {slugify(it["meta"]["title"]) for it in topics}
+    pending = [(t, w) for (t, w) in suggested if slugify(t) not in existing]
+    if pending:
+        nav.append('<div class="group">Suggested · not generated</div><nav class="suggested">')
+        for title, why in pending:
+            slug = slugify(title)
+            pid = f"suggest-{slug}"
+            nav.append(f'<a data-target="{pid}">{html.escape(title)}</a>')
+            why_html = f'<p class="sub">{html.escape(why)}</p>' if why else ""
+            cmd = f'add-topic "{title}"'
+            cmd_deep = f'add-topic "{title}" --depth=deep'
+            panes.append(
+                f'<section class="pane" id="{pid}">'
+                f'<h1>{html.escape(title)} <span class="badge depth">suggested</span></h1>'
+                f'{why_html}'
+                f'<p>Not generated yet. Run this prompt to add it at standard depth:</p>'
+                f'<div class="prompt"><code id="cmd-{slug}">{html.escape(cmd)}</code>'
+                f'<button class="copy" onclick="copyEl(\'cmd-{slug}\',this)">Copy</button></div>'
+                f'<p>Or go deeper:</p>'
+                f'<div class="prompt"><code id="cmdd-{slug}">{html.escape(cmd_deep)}</code>'
+                f'<button class="copy" onclick="copyEl(\'cmdd-{slug}\',this)">Copy</button></div>'
+                f'</section>'
+            )
+        nav.append("</nav>")
 
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)
