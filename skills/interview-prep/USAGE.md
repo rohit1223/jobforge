@@ -22,9 +22,12 @@ re-fetched or overwritten.
 Generate **any single topic on demand** — a strength to revise *or* a gap you
 want to learn — at a depth you pick.
 
-> "add-topic Redis --depth=deep" · "add-topic gRPC" · "explore Kafka quick"
+> "add-topic Redis --depth=deep" · "add-topic gRPC --detailed" · "explore Kafka quick"
 
 - Default depth is **standard** (same as Mode 1 output).
+- Add **`--detailed`** to fetch *more concepts* (extra sources + expanded
+  fundamentals/worked examples) without changing the question count — ideal when
+  the topic is **new to you**. It's on by default for `learning` topics.
 - Topics you can't yet defend are flagged with a **learning** badge.
 
 ### 3. Add a note  (`add-note`)
@@ -40,6 +43,10 @@ source (80/20) into a note section under **Notes**.
 | `quick` | ~5 | core mechanism + top trade-off | 1 |
 | `standard` *(default)* | 10–15 | full senior mental-model (internals · trade-offs · failure modes · tuning) | 1–2 |
 | `deep` | ~20–25 | exhaustive + code examples + multiple system-design prompts | several |
+
+**`--detailed`** is orthogonal to depth: keep your chosen question count but pull
+*more concepts* — extra doc sources plus prerequisites/fundamentals and worked
+examples. Best for unfamiliar topics; on by default for `learning` topics.
 
 ## Reading the dashboard
 

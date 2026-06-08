@@ -28,6 +28,7 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
   | `quick` | ~5 | core mechanism + top trade-off | 1 |
   | `standard` *(default)* | 10–15 | full senior mental-model | 1–2 |
   | `deep` | ~20–25 | exhaustive + code + multiple design prompts | several |
+- **`--detailed`** (modifier, orthogonal to `--depth`): fetch **more concepts** — extra doc sources/Context7 queries and an expanded **Core concepts** section that adds prerequisites/fundamentals and worked examples, without necessarily raising the question count. Use it when the topic is **new to the user** and needs more grounding (e.g. `add-topic <t> --depth=standard --detailed`). Record `detailed: true` in frontmatter when used.
 
 ## Mode 1 — build / refresh the dashboard  (throttled)
 
@@ -38,11 +39,12 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
 5. **Write `topics/<slug>.md`** (`generated: true`) using the **deep content template** below. Skip existing files unless `--refresh <slug>`.
 6. **Rebuild** (`build.py`), then tell the user: the path to open, the ~3 topics generated, and the **suggested next** topics (re-run Mode 1 for the next ~3, or `add-topic <name>` for a specific one).
 
-## Mode 3 — add a topic on demand  (`add-topic <topic> [--depth=quick|standard|deep]`)
+## Mode 3 — add a topic on demand  (`add-topic <topic> [--depth=quick|standard|deep] [--detailed]`)
 
 1. Generate **one named topic** — matched OR a gap you want to learn — at the requested depth (default `standard`; see the depth-tier table above for what each controls).
-2. **Source official docs** per **Doc sourcing**, scaling fetch breadth to depth. Write `topics/<slug>.md` (`generated: true`, `depth: <tier>`). If the resume can't yet defend it, set `learning: true` (and omit `must`). Remove it from `suggested.md` if present.
-3. **Rebuild** with `build.py`. Not throttled — this is an explicit single topic.
+2. **`--detailed`**: when set, fetch **more concepts** — pull from additional doc sources/Context7 queries and expand the **Core concepts** section with prerequisites/fundamentals and worked examples (the question count still follows `--depth`). Default this **on** for topics flagged `learning` / unfamiliar, since a new topic needs more grounding. Record `detailed: true` in frontmatter.
+3. **Source official docs** per **Doc sourcing**, scaling fetch breadth to depth (and wider when `--detailed`). Write `topics/<slug>.md` (`generated: true`, `depth: <tier>`, `detailed:` if used). If the resume can't yet defend it, set `learning: true` (and omit `must`). Remove it from `suggested.md` if present.
+4. **Rebuild** with `build.py`. Not throttled — this is an explicit single topic.
 
 ### Deep content template (this is the quality bar — not an overview)
 

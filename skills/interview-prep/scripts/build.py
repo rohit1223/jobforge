@@ -126,6 +126,10 @@ a{color:var(--accent)}
 code{background:#0d1117;padding:2px 6px;border-radius:5px;font-size:13px}
 pre{background:#0d1117;border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto}
 pre code{padding:0;background:none}
+table{border-collapse:collapse;margin:14px 0;width:100%;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 12px;text-align:left;vertical-align:top}
+th{background:rgba(255,255,255,.05);color:#fff;font-weight:600}
+tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 blockquote{border-left:3px solid var(--accent);margin:0;padding:2px 16px;color:var(--muted)}
 details{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:rgba(255,255,255,.02)}
 details>summary{cursor:pointer;padding:11px 16px;font-weight:600;color:#fff;list-style:none}
