@@ -51,7 +51,10 @@ examples. Best for unfamiliar topics; on by default for `learning` topics.
 ## Reading the dashboard
 
 - **Left sidebar** — the guide (this page), Topics (gap-weighted / must-first),
-  Notes, and the Suggested backlog. Use the **Filter** box to jump around.
+  Notes, and the **Suggested** backlog. Use the **Filter** box to jump around.
+- **Suggested · not generated** — collapsible groups, **résumé topics first, then
+  JD topics**. Click any to open a pane with ready-to-copy prompts (standard /
+  `--detailed` / deep+detailed). An item disappears from here once you generate it.
 - **Badges** — `must` (JD-required), `learning` (still studying, can't fully
   defend yet), and the depth tier (`quick`/`standard`/`deep`).
 - **Questions** are **click-to-reveal**: read the question, think, then expand

@@ -109,6 +109,12 @@ nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);col
 .badge.depth{background:rgba(139,149,163,.14);color:var(--muted)}
 .badge.depth.deep{background:rgba(199,146,234,.16);color:#c792ea}
 .badge.depth.quick{background:rgba(127,209,255,.14);color:#7fd1ff}
+details.navgroup{border:none;background:none;border-radius:0;margin:0}
+details.navgroup>summary{padding:14px 18px 6px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;border-bottom:none}
+details.navgroup>summary:hover{background:rgba(255,255,255,.03)}
+details.navgroup>summary::before{content:"\\25B8  ";color:var(--muted);font-weight:700}
+details.navgroup[open]>summary::before{content:"\\25BE  "}
+details.navgroup>*:not(summary){padding-left:0;padding-right:0;padding-bottom:0}
 nav.suggested{counter-reset:sg}
 nav.suggested a{align-items:center}
 nav.suggested a::before{counter-increment:sg;content:counter(sg);flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid var(--line);border-radius:50%;font-size:10px;color:var(--muted)}
@@ -166,22 +172,30 @@ function fbCopy(text,done){var ta=document.createElement('textarea');ta.value=te
 
 
 def read_suggested():
-    """Parse <datadir>/suggested.md lines like '- Title — why' into (title, why)."""
+    """Parse <datadir>/suggested.md into (origin, title, why) tuples.
+
+    `## Section` headers set the origin group (preserving file order, so résumé
+    sections listed first stay first); `- Title — why` lines are the items.
+    """
     path = os.path.join(DATADIR, "suggested.md")
     items = []
+    origin = "Suggested"
     if os.path.isfile(path):
         with open(path, encoding="utf-8") as f:
             for line in f:
-                line = line.strip()
-                if line.startswith("- "):
-                    rest = line[2:].strip().lstrip("*").rstrip("*").strip()
+                s = line.strip()
+                if s.startswith("## "):
+                    origin = s[3:].strip()
+                    continue
+                if s.startswith("- "):
+                    rest = s[2:].strip().strip("*").strip()
                     for sep in (" — ", " -- ", " - ", ": "):
                         if sep in rest:
                             title, why = rest.split(sep, 1)
                             break
                     else:
                         title, why = rest, ""
-                    items.append((title.strip().strip("*"), why.strip()))
+                    items.append((origin, title.strip().strip("*"), why.strip()))
     return items
 
 
@@ -221,32 +235,48 @@ def build():
     emit("Topics", topics)
     emit("Notes", notes)
 
-    # Suggested-but-not-generated group: ordered, clickable; each opens a pane
-    # with the exact copy-able prompt. Auto-dropped once that topic is generated.
+    # Suggested-but-not-generated: collapsible groups by origin (résumé first,
+    # then JD — file order preserved). Each item opens a pane with copy-able
+    # prompts (standard / +detailed / deep+detailed). Auto-dropped once generated.
     existing = {it["slug"] for it in topics} | {slugify(it["meta"]["title"]) for it in topics}
-    pending = [(t, w) for (t, w) in suggested if slugify(t) not in existing]
+    pending = [(o, t, w) for (o, t, w) in suggested if slugify(t) not in existing]
+
+    def prompt_row(eid, cmd):
+        return (f'<div class="prompt"><code id="{eid}">{html.escape(cmd)}</code>'
+                f'<button class="copy" onclick="copyEl(\'{eid}\',this)">Copy</button></div>')
+
     if pending:
-        nav.append('<div class="group">Suggested · not generated</div><nav class="suggested">')
-        for title, why in pending:
-            slug = slugify(title)
-            pid = f"suggest-{slug}"
-            nav.append(f'<a data-target="{pid}">{html.escape(title)}</a>')
-            why_html = f'<p class="sub">{html.escape(why)}</p>' if why else ""
-            cmd = f'add-topic "{title}"'
-            cmd_deep = f'add-topic "{title}" --depth=deep'
-            panes.append(
-                f'<section class="pane" id="{pid}">'
-                f'<h1>{html.escape(title)} <span class="badge depth">suggested</span></h1>'
-                f'{why_html}'
-                f'<p>Not generated yet. Run this prompt to add it at standard depth:</p>'
-                f'<div class="prompt"><code id="cmd-{slug}">{html.escape(cmd)}</code>'
-                f'<button class="copy" onclick="copyEl(\'cmd-{slug}\',this)">Copy</button></div>'
-                f'<p>Or go deeper:</p>'
-                f'<div class="prompt"><code id="cmdd-{slug}">{html.escape(cmd_deep)}</code>'
-                f'<button class="copy" onclick="copyEl(\'cmdd-{slug}\',this)">Copy</button></div>'
-                f'</section>'
+        nav.append('<div class="group">Suggested · not generated</div>')
+        order, by_origin = [], {}
+        for origin, title, why in pending:
+            if origin not in by_origin:
+                by_origin[origin] = []
+                order.append(origin)
+            by_origin[origin].append((title, why))
+        for gi, origin in enumerate(order):
+            items_ = by_origin[origin]
+            open_attr = " open" if gi == 0 else ""
+            nav.append(
+                f'<details class="navgroup"{open_attr}>'
+                f'<summary>{html.escape(origin)} ({len(items_)})</summary>'
+                f'<nav class="suggested">'
             )
-        nav.append("</nav>")
+            for title, why in items_:
+                slug = slugify(title)
+                pid = f"suggest-{slug}"
+                nav.append(f'<a data-target="{pid}">{html.escape(title)}</a>')
+                why_html = f'<p class="sub">{html.escape(origin)} · {html.escape(why)}</p>' if why else ""
+                panes.append(
+                    f'<section class="pane" id="{pid}">'
+                    f'<h1>{html.escape(title)} <span class="badge depth">suggested</span></h1>'
+                    f'{why_html}'
+                    f'<p>Not generated yet. Copy a prompt to add it:</p>'
+                    f'<p class="sub">Standard depth</p>{prompt_row(f"c1-{slug}", f"""add-topic \"{title}\"""")}'
+                    f'<p class="sub">More concepts (good for an unfamiliar topic)</p>{prompt_row(f"c2-{slug}", f"""add-topic \"{title}\" --detailed""")}'
+                    f'<p class="sub">Deep + detailed</p>{prompt_row(f"c3-{slug}", f"""add-topic \"{title}\" --depth=deep --detailed""")}'
+                    f'</section>'
+                )
+            nav.append("</nav></details>")
 
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)
