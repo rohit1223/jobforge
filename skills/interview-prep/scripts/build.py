@@ -158,6 +158,13 @@ details.g-shaky>summary{box-shadow:inset 3px 0 0 #ffb84d}
 details.g-missed>summary{box-shadow:inset 3px 0 0 var(--gap)}
 nav a .prog{margin-left:auto;font-size:10px;color:var(--muted)}
 nav a .prog.done{color:var(--must)}
+.quizrow{display:flex;gap:8px;margin:0 18px 8px}
+.quizrow button{flex:1;cursor:pointer;border:1px solid var(--line);background:#0d1117;color:var(--fg);border-radius:8px;padding:7px 0;font-size:12px}
+.quizrow button:hover{border-color:var(--accent)}
+.quizq{font-size:17px;font-weight:600;margin:18px 0;color:#fff;line-height:1.5}
+.quizctl{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.quizctl button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:8px 16px;font-size:13px}
+.quizctl button:hover{border-color:var(--accent)}
 """
 
 JS = """
@@ -221,6 +228,51 @@ function updateProg(){
   });
 }
 updateProg();
+
+/* --- quiz mode: shuffled flashcard runs --- */
+const qpane=document.getElementById('quizpane');
+let deck=[],qpos=0,tally={};
+function titleOf(pid){const a=links.find(l=>l.dataset.target===pid);return a?a.childNodes[0].textContent.trim():pid}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startQuiz(weak){
+  deck=[];Object.keys(quizIndex).forEach(pid=>quizIndex[pid].forEach(q=>deck.push({pid,key:q.key,el:q.el})));
+  if(weak)deck=deck.filter(c=>prog[c.key]==='shaky'||prog[c.key]==='missed');
+  if(!deck.length){alert(weak?'Nothing graded shaky/missed yet \\u2014 grade some questions first.':'No questions found.');return}
+  shuffle(deck);if(!weak&&deck.length>20)deck=deck.slice(0,20);
+  qpos=0;tally={good:0,shaky:0,missed:0};quizCard();show('quizpane');
+}
+function quizCard(){
+  if(qpos>=deck.length)return quizDone();
+  const c=deck[qpos],d=c.el;
+  const sum=d.querySelector(':scope > summary');
+  const ans=[...d.children].filter(x=>x.tagName!=='SUMMARY'&&!x.classList.contains('gradebar')).map(x=>x.outerHTML).join('');
+  qpane.innerHTML='<p class="sub">Question '+(qpos+1)+' / '+deck.length+' \\u00b7 '+titleOf(c.pid)+'</p>'
+    +'<div class="quizq">'+sum.innerHTML+'</div>'
+    +'<div id="quizans" style="display:none">'+ans+'</div>'
+    +'<div class="quizctl"><button id="qreveal">Reveal answer</button>'
+    +Object.keys(GRADES).map(g=>'<button class="qgrade" data-g="'+g+'" style="display:none">'+GRADES[g]+'</button>').join('')
+    +'<button id="qskip">Skip</button><button id="qend">End quiz</button></div>';
+  document.getElementById('qreveal').onclick=()=>{
+    document.getElementById('quizans').style.display='';
+    document.getElementById('qreveal').style.display='none';
+    qpane.querySelectorAll('.qgrade').forEach(b=>b.style.display='');
+  };
+  qpane.querySelectorAll('.qgrade').forEach(b=>b.onclick=()=>{
+    prog[c.key]=b.dataset.g;saveProg();applyGrade(c.key,d);updateProg();
+    tally[b.dataset.g]++;qpos++;quizCard();
+  });
+  document.getElementById('qskip').onclick=()=>{qpos++;quizCard()};
+  document.getElementById('qend').onclick=quizDone;
+}
+function quizDone(){
+  qpane.innerHTML='<h1>Quiz finished</h1><p>'+tally.good+' knew \\u00b7 '+tally.shaky+' shaky \\u00b7 '+tally.missed+' missed (deck of '+deck.length+')</p>'
+    +'<div class="quizctl"><button id="qagain">New quiz</button><button id="qweak2">Weak only</button></div>';
+  document.getElementById('qagain').onclick=()=>startQuiz(false);
+  document.getElementById('qweak2').onclick=()=>startQuiz(true);
+}
+const qa=document.getElementById('quiz-all'),qw=document.getElementById('quiz-weak');
+if(qa)qa.onclick=()=>startQuiz(false);
+if(qw)qw.onclick=()=>startQuiz(true);
 """
 
 
@@ -355,9 +407,10 @@ def build():
 <h1>Interview Prep</h1>
 <p class="sub">{total} section{"s" if total != 1 else ""} · {total_q} questions</p>
 <input id="search" placeholder="Filter…" autocomplete="off">
+<div class="quizrow"><button id="quiz-all">▶ Quiz me</button><button id="quiz-weak">Weak only</button></div>
 {"".join(nav)}
 </aside>
-<main>{body_panes}</main>
+<main>{body_panes}<section class="pane" id="quizpane"></section></main>
 <script>{JS}</script>
 </body></html>"""
 
