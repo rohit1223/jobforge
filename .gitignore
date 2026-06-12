@@ -17,3 +17,6 @@
 
 # interview-prep generated dashboard
 interview-prep/index.html
+
+# Python
+__pycache__/
