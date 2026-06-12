@@ -147,6 +147,17 @@ details>*:not(summary){padding-left:16px;padding-right:16px}
 details>*:last-child{padding-bottom:12px}
 .qcount{color:var(--muted);font-size:12px;margin:-6px 0 14px}
 .empty{color:var(--muted);margin-top:40px}
+.gradebar{display:flex;gap:8px;align-items:center;border-top:1px dashed var(--line);margin-top:10px;padding:10px 16px 12px;color:var(--muted);font-size:12px}
+.gradebar button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:12px}
+.gradebar button:hover{border-color:var(--accent)}
+.gradebar button.on[data-g=good]{background:rgba(61,220,151,.18);border-color:var(--must);color:var(--must)}
+.gradebar button.on[data-g=shaky]{background:rgba(255,184,77,.18);border-color:#ffb84d;color:#ffb84d}
+.gradebar button.on[data-g=missed]{background:rgba(255,122,89,.18);border-color:var(--gap);color:var(--gap)}
+details.g-good>summary{box-shadow:inset 3px 0 0 var(--must)}
+details.g-shaky>summary{box-shadow:inset 3px 0 0 #ffb84d}
+details.g-missed>summary{box-shadow:inset 3px 0 0 var(--gap)}
+nav a .prog{margin-left:auto;font-size:10px;color:var(--muted)}
+nav a .prog.done{color:var(--must)}
 """
 
 JS = """
@@ -167,6 +178,49 @@ function copyEl(id,btn){var el=document.getElementById(id);if(!el)return;var tex
   var done=function(){var o=btn.textContent;btn.textContent='✓ Copied';setTimeout(function(){btn.textContent=o},1200)};
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){fbCopy(text,done)})}else{fbCopy(text,done)}}
 function fbCopy(text,done){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(ta);done()}
+
+/* --- self-quiz progress (persisted in localStorage) --- */
+const PKEY='iprep.progress.v1';
+let prog={};try{prog=JSON.parse(localStorage.getItem(PKEY)||'{}')}catch(e){}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(prog))}catch(e){}}
+const GRADES={good:'\\u2713 Knew it',shaky:'~ Shaky',missed:'\\u2717 Missed'};
+const quizIndex={};
+function isQ(d){var s=d.querySelector(':scope > summary');return s&&/^Q\\b/.test(s.textContent.trim())}
+panes.forEach(p=>{
+  const qs=[...p.querySelectorAll('details')].filter(isQ);
+  if(!qs.length)return;
+  quizIndex[p.id]=qs.map((d,i)=>{
+    const key=p.id+'#'+i;
+    const bar=document.createElement('div');bar.className='gradebar';
+    bar.innerHTML='<span>Self-grade:</span>'+Object.keys(GRADES).map(g=>'<button data-g="'+g+'">'+GRADES[g]+'</button>').join('');
+    d.appendChild(bar);
+    bar.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;setGrade(key,d,b.dataset.g)});
+    applyGrade(key,d);
+    return {el:d,key};
+  });
+});
+function applyGrade(key,d){
+  const g=prog[key];
+  d.classList.remove('g-good','g-shaky','g-missed');
+  if(g)d.classList.add('g-'+g);
+  d.querySelectorAll('.gradebar button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
+}
+function setGrade(key,d,g){
+  if(prog[key]===g){delete prog[key]}else{prog[key]=g}
+  saveProg();applyGrade(key,d);updateProg();
+}
+function updateProg(){
+  Object.keys(quizIndex).forEach(pid=>{
+    const list=quizIndex[pid];
+    const good=list.filter(q=>prog[q.key]==='good').length;
+    const a=links.find(l=>l.dataset.target===pid);if(!a)return;
+    let sp=a.querySelector('.prog');
+    if(!sp){sp=document.createElement('span');sp.className='prog';a.appendChild(sp)}
+    sp.textContent=good+'/'+list.length;
+    sp.classList.toggle('done',good===list.length&&list.length>0);
+  });
+}
+updateProg();
 """
 
 
