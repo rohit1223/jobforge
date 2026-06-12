@@ -389,13 +389,14 @@ def build():
         nav.append('<nav><a data-target="guide">ℹ️  How to use</a></nav>')
         panes.append(f'<section class="pane" id="guide">{md_to_html(guide_body)}</section>')
 
-    def emit(group, items):
+    def emit(group, items, idprefix=None):
         nonlocal nav, panes
         if not items:
             return
+        idprefix = idprefix or group.lower()
         nav.append(f'<div class="group">{html.escape(group)}</div><nav>')
         for it in items:
-            pid = f"{group.lower()}-{it['slug']}"
+            pid = f"{idprefix}-{it['slug']}"
             nav.append(
                 f'<a data-target="{html.escape(pid)}">{html.escape(it["meta"]["title"])}{badge(it)}</a>'
             )
@@ -418,8 +419,24 @@ def build():
             )
         nav.append("</nav>")
 
-    emit("Topics", topics)
-    emit("Notes", notes)
+    # Topics grouped by bucket when more than one bucket is present; pane ids
+    # stay "topics-<slug>" regardless so saved quiz progress survives regrouping.
+    buckets, order = {}, []
+    for it in topics:
+        b = (it["meta"].get("bucket") or "tech").strip().lower()
+        if b not in buckets:
+            buckets[b] = []
+        buckets[b].append(it)
+    BUCKET_ORDER = ["tech", "domain", "experience", "soft"]
+    BUCKET_LABEL = {"tech": "Topics · Tech", "domain": "Topics · Domain",
+                    "experience": "Topics · Experience", "soft": "Topics · Soft skills"}
+    if len(buckets) > 1:
+        ordered = [b for b in BUCKET_ORDER if b in buckets] + sorted(b for b in buckets if b not in BUCKET_ORDER)
+        for b in ordered:
+            emit(BUCKET_LABEL.get(b, f"Topics · {b.title()}"), buckets[b], idprefix="topics")
+    else:
+        emit("Topics", topics, idprefix="topics")
+    emit("Notes", notes, idprefix="notes")
 
     # Suggested-but-not-generated: collapsible groups by origin (résumé first,
     # then JD — file order preserved). Each item opens a pane with copy-able
