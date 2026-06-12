@@ -12,6 +12,7 @@ Usage: python3 build.py [datadir]   (datadir defaults to "interview-prep")
 import datetime
 import glob
 import html
+import json
 import os
 import re
 import subprocess
@@ -185,6 +186,7 @@ body{display:flex;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Robo
 #sidebar h1{font-size:15px;margin:0 18px 4px;letter-spacing:.3px}
 #sidebar .sub{color:var(--muted);font-size:12px;margin:0 18px 16px}
 .group{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:18px 18px 6px}
+nav{display:flex;flex-direction:column}
 nav a{display:flex;align-items:center;gap:6px;padding:7px 18px;color:var(--fg);text-decoration:none;border-left:3px solid transparent;cursor:pointer;font-size:14px}
 nav a:hover{background:rgba(255,255,255,.04)}
 nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);color:#fff}
@@ -208,6 +210,9 @@ nav.suggested a::before{counter-increment:sg;content:counter(sg);flex:none;displ
 .prompt button.copy{flex:none;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:5px 11px;font-size:12px}
 .prompt button.copy:hover{background:rgba(77,163,255,.12);border-color:var(--accent)}
 #search{width:calc(100% - 36px);margin:0 18px 8px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#0d1117;color:var(--fg)}
+#jobsel{width:calc(100% - 36px);margin:0 18px 8px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#0d1117;color:var(--fg);font-size:13px}
+.angle{border-left:3px solid var(--accent);background:rgba(77,163,255,.08);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:14px}
+.angle strong{color:var(--accent)}
 main{flex:1;height:100vh;overflow-y:auto;padding:40px 56px;max-width:900px}
 .pane{display:none}.pane.active{display:block;animation:f .15s ease}
 @keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
@@ -288,14 +293,66 @@ function show(id){
 links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.dataset.target)}));
 const search=document.getElementById('search');
 const paneText={};panes.forEach(p=>paneText[p.id]=p.textContent.toLowerCase());
-if(search)search.addEventListener('input',()=>{
-  const q=search.value.trim().toLowerCase();
+if(search)search.addEventListener('input',()=>applyJob());
+
+/* --- job switcher: one source of truth for sidebar visibility ------------- */
+const jobsel=document.getElementById('jobsel');
+let curJob='';try{curJob=localStorage.getItem('iprep.job.v1')||''}catch(e){}
+if(!(curJob in JOBS))curJob='';
+function jobEntry(slug){return (curJob&&JOBS[curJob]&&JOBS[curJob].topics[slug])||null}
+function setMust(a,on){
+  let b=a.querySelector('.badge.must');
+  if(on&&!b){b=document.createElement('span');b.className='badge must';b.textContent='must';a.insertBefore(b,a.querySelector('.prog'))}
+  if(!on&&b)b.remove();
+}
+function applyJob(){
+  const q=search?search.value.trim().toLowerCase():'';
   links.forEach(a=>{
-    const hit=!q||a.textContent.toLowerCase().includes(q)||(paneText[a.dataset.target]||'').includes(q);
-    a.style.display=hit?'':'none';
+    const pid=a.dataset.target;
+    const slug=pid.indexOf('topics-')===0?a.dataset.slug:null;
+    let vis=true;
+    if(slug&&curJob){
+      const e=jobEntry(slug);
+      vis=!!e;
+      a.style.order=e?String((e.must?0:1000)+(e.rank||999)):'';
+      setMust(a,!!(e&&e.must));
+    }else if(slug){
+      a.style.order='';
+      setMust(a,a.dataset.must==='1');
+    }
+    if(q&&vis)vis=a.textContent.toLowerCase().includes(q)||(paneText[pid]||'').includes(q);
+    a.style.display=vis?'':'none';
   });
-  if(q)document.querySelectorAll('details.navgroup').forEach(d=>{d.open=true});
-});
+  document.querySelectorAll('details.navgroup').forEach(d=>{
+    d.style.display=((d.getAttribute('data-job')||'')===curJob)?'':'none';
+    if(q)d.open=true;
+  });
+  document.querySelectorAll('.angle').forEach(el=>el.remove());
+  if(curJob){
+    const J=JOBS[curJob];
+    Object.keys(J.topics).forEach(slug=>{
+      const e=J.topics[slug];if(!e.angle)return;
+      const p=document.getElementById('topics-'+slug);if(!p)return;
+      const div=document.createElement('div');div.className='angle';
+      const b=document.createElement('strong');b.textContent=J.label+': ';
+      div.appendChild(b);div.appendChild(document.createTextNode(e.angle));
+      const h1=p.querySelector('h1');p.insertBefore(div,h1?h1.nextSibling:p.firstChild);
+    });
+  }
+  const act=links.find(a=>a.classList.contains('active'));
+  if(act&&act.style.display==='none'){
+    const first=links.find(a=>a.style.display!=='none');
+    if(first)show(first.dataset.target);
+  }
+}
+if(jobsel){
+  jobsel.value=curJob;
+  jobsel.addEventListener('change',()=>{
+    curJob=jobsel.value;
+    try{localStorage.setItem('iprep.job.v1',curJob)}catch(e){}
+    applyJob();
+  });
+}
 const first=(location.hash&&document.getElementById(location.hash.slice(1)))?location.hash.slice(1):(panes[0]&&panes[0].id);
 if(first)show(first);
 function copyEl(id,btn){var el=document.getElementById(id);if(!el)return;var text=el.textContent;
@@ -352,7 +409,11 @@ let deck=[],qpos=0,tally={};
 function titleOf(pid){const a=links.find(l=>l.dataset.target===pid);return a?a.childNodes[0].textContent.trim():pid}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function startQuiz(weak){
-  deck=[];Object.keys(quizIndex).forEach(pid=>quizIndex[pid].forEach(q=>deck.push({pid,key:q.key,el:q.el})));
+  deck=[];
+  Object.keys(quizIndex).forEach(pid=>{
+    if(curJob&&pid.indexOf('topics-')===0&&!JOBS[curJob].topics[pid.slice(7)])return;
+    quizIndex[pid].forEach(q=>deck.push({pid,key:q.key,el:q.el}));
+  });
   if(weak)deck=deck.filter(c=>prog[c.key]==='shaky'||prog[c.key]==='missed');
   if(!deck.length){alert(weak?'Nothing graded shaky/missed yet \\u2014 grade some questions first.':'No questions found.');return}
   shuffle(deck);if(!weak&&deck.length>20)deck=deck.slice(0,20);
@@ -440,6 +501,8 @@ document.addEventListener('keydown',e=>{
     show(vis[nxt].dataset.target);vis[nxt].scrollIntoView({block:'nearest'});
   }
 });
+
+applyJob();
 """
 
 
@@ -628,6 +691,60 @@ def build():
                 )
             nav.append("</nav></details>")
 
+    # Per-job suggested groups (hidden unless that job is selected) + the JOBS
+    # payload driving the client-side job switcher.
+    topic_slugs = {it["slug"] for it in topics}
+    jobs_map = {}
+    for j in jobs:
+        jdir, jlabel = j["dir"], j.get("job", j["dir"])
+        tmap, missing = {}, []
+        for t in j["topics"]:
+            try:
+                rank = int(t.get("rank", "9999"))
+            except ValueError:
+                rank = 9999
+            if t["slug"] in topic_slugs:
+                e = {"must": truthy(t.get("must")), "rank": rank}
+                if t.get("angle"):
+                    e["angle"] = t["angle"]
+                tmap[t["slug"]] = e
+            else:
+                missing.append(t)
+        jobs_map[jdir] = {"label": jlabel, "topics": tmap}
+        if missing:
+            nav.append(
+                f'<details class="navgroup" data-job="{html.escape(jdir)}" open style="display:none">'
+                f'<summary>Suggested for this job ({len(missing)})</summary><nav class="suggested">'
+            )
+            for t in missing:
+                slug = t["slug"]
+                title = t.get("title") or slug.replace("-", " ").title()
+                pid = f"jsg-{jdir}-{slug}"
+                why = t.get("why") or t.get("angle") or ""
+                why_html = (f'<p class="sub">{html.escape(jlabel)} · {html.escape(why)}</p>'
+                            if why else "")
+                nav.append(f'<a data-target="{html.escape(pid)}">{html.escape(title)}</a>')
+                cmd_std = f'add-topic "{title}" --detailed'
+                cmd_deep = f'add-topic "{title}" --depth=deep --detailed'
+                panes.append(
+                    f'<section class="pane" id="{html.escape(pid)}">'
+                    f'<h1>{html.escape(title)} <span class="badge depth">suggested</span></h1>'
+                    f'{why_html}'
+                    f'<p>Not generated yet. Copy a prompt to add it:</p>'
+                    f'<p class="sub">Standard + detailed (good for a gap)</p>{prompt_row(f"j1-{jdir}-{slug}", cmd_std)}'
+                    f'<p class="sub">Deep + detailed</p>{prompt_row(f"j2-{jdir}-{slug}", cmd_deep)}'
+                    f'</section>'
+                )
+            nav.append("</nav></details>")
+
+    jobs_json = json.dumps(jobs_map, ensure_ascii=False).replace("</", "<\\/")
+    job_opts = "".join(
+        f'<option value="{html.escape(j["dir"])}">{html.escape(j.get("job", j["dir"]))}</option>'
+        for j in jobs
+    )
+    jobsel_html = (f'<select id="jobsel"><option value="">All topics</option>{job_opts}</select>'
+                   if jobs else "")
+
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)
     total_q = sum(it["html"].count("<details>") for it in topics + notes)
@@ -642,12 +759,14 @@ def build():
 <aside id="sidebar">
 <h1>Interview Prep</h1>
 <p class="sub">{total} section{"s" if total != 1 else ""} · {total_q} questions</p>
+{jobsel_html}
 <input id="search" placeholder="Filter…" autocomplete="off">
 <div class="quizrow"><button id="quiz-all">▶ Quiz me</button><button id="quiz-weak">Weak only</button></div>
 {"".join(nav)}
 </aside>
 <main>{body_panes}<section class="pane" id="quizpane"></section></main>
-<script>{JS}</script>
+<script>const JOBS={jobs_json};
+{JS}</script>
 </body></html>"""
 
     out = os.path.join(DATADIR, "index.html")
