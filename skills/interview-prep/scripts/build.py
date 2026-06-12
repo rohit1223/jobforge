@@ -232,9 +232,12 @@ def build():
                 )
                 label = "sources" if len(urls) > 1 else "source"
                 cite = f'<p class="sub">{label}: {links_html}</p>'
+            nq = it["html"].count("<details>")
+            qline = (f'<p class="qcount">{nq} self-quiz question{"s" if nq != 1 else ""}</p>'
+                     if nq else "")
             panes.append(
                 f'<section class="pane" id="{html.escape(pid)}">'
-                f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{it["html"]}</section>'
+                f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{qline}{it["html"]}</section>'
             )
         nav.append("</nav>")
 
@@ -286,6 +289,7 @@ def build():
 
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)
+    total_q = sum(it["html"].count("<details>") for it in topics + notes)
 
     doc = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -295,7 +299,7 @@ def build():
 <body>
 <aside id="sidebar">
 <h1>Interview Prep</h1>
-<p class="sub">{total} section{"s" if total != 1 else ""}</p>
+<p class="sub">{total} section{"s" if total != 1 else ""} · {total_q} questions</p>
 <input id="search" placeholder="Filter…" autocomplete="off">
 {"".join(nav)}
 </aside>
