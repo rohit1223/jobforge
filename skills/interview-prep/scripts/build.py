@@ -72,7 +72,7 @@ def topic_key(it):
         rank = 9999
     return (
         0 if truthy(m.get("must")) else 1,
-        0 if truthy(m.get("gap")) else 1,
+        0 if truthy(m.get("learning")) else 1,
         rank,
         it["meta"]["title"].lower(),
     )
@@ -104,7 +104,6 @@ nav a:hover{background:rgba(255,255,255,.04)}
 nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);color:#fff}
 .badge{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:6px;letter-spacing:.04em}
 .badge.must{background:rgba(61,220,151,.16);color:var(--must)}
-.badge.gap{background:rgba(255,122,89,.16);color:var(--gap)}
 .badge.learning{background:rgba(255,184,77,.16);color:#ffb84d}
 .badge.depth{background:rgba(139,149,163,.14);color:var(--muted)}
 .badge.depth.deep{background:rgba(199,146,234,.16);color:#c792ea}
@@ -224,8 +223,15 @@ def build():
                 f'<a data-target="{html.escape(pid)}">{html.escape(it["meta"]["title"])}{badge(it)}</a>'
             )
             src = it["meta"].get("source") or it["meta"].get("sources")
-            cite = (f'<p class="sub">source: <a href="{html.escape(src)}" target="_blank" rel="noopener">{html.escape(src)}</a></p>'
-                    if src else "")
+            cite = ""
+            if src:
+                urls = [u.strip() for u in src.split(",") if u.strip()]
+                links_html = " · ".join(
+                    f'<a href="{html.escape(u)}" target="_blank" rel="noopener">{html.escape(u)}</a>'
+                    for u in urls
+                )
+                label = "sources" if len(urls) > 1 else "source"
+                cite = f'<p class="sub">{label}: {links_html}</p>'
             panes.append(
                 f'<section class="pane" id="{html.escape(pid)}">'
                 f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{it["html"]}</section>'
