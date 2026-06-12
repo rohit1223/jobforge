@@ -60,8 +60,22 @@ examples. Best for unfamiliar topics; on by default for `learning` topics.
 
 ## Reading the dashboard
 
-- **Left sidebar** — the guide (this page), Topics (gap-weighted / must-first),
-  Notes, and the **Suggested** backlog. Use the **Filter** box to jump around.
+- **Left sidebar** — the guide (this page), Topics (gap-weighted / must-first,
+  grouped by bucket when there's more than one), Notes, the **Suggested**
+  backlog, and the **Applications** tracker. The **Filter** box searches full
+  topic content, not just titles.
+- **Self-grading** — every revealed answer has ✓ Knew it / ~ Shaky / ✗ Missed
+  buttons. Grades persist in your browser (localStorage); each topic shows a
+  `known/total` counter in the sidebar that turns green when complete.
+- **Quiz me / Weak only** — shuffled flashcard runs (up to 20 questions across
+  all topics, or only what you've graded shaky/missed). Grades write back to
+  the same progress store.
+- **Keyboard** — `j`/`k` move between topics, `/` focuses the filter, `Esc`
+  blurs it. Each topic also has **Expand all / Collapse all** buttons.
+- **Print** — `Cmd+P` on a topic prints a light-themed cheat sheet with every
+  answer opened (and restores your open/closed state afterwards).
+- **Applications** — rendered from `applications/*/status.yml`; shows stage and
+  a next-interview countdown (red within 7 days).
 - **Suggested · not generated** — collapsible groups, **résumé topics first, then
   JD topics**. Click any to open a pane with ready-to-copy prompts (standard /
   `--detailed` / deep+detailed). An item disappears from here once you generate it.
