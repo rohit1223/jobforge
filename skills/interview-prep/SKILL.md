@@ -19,7 +19,7 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
   └── index.html         # generated build artifact (gitignored)
   ```
 - **Build:** `python3 skills/interview-prep/scripts/build.py interview-prep` renders every `.md` (via `pandoc`) into one self-contained `index.html` (inline CSS/JS, sidebar nav, collapsible Q&A). Run it after any `.md` change.
-- **Topic frontmatter:** `title`, `bucket` (tech/soft/experience/domain), `must` (bool — JD-required, floats to top), `learning` (bool — a topic you can't yet fully defend; shows a "learning" badge), `depth` (`quick`/`standard`/`deep`), `rank` (int; lower = higher), `sources` (url), `generated` (bool — `true` until a human edits it).
+- **Topic frontmatter:** `title`, `bucket` (tech/soft/experience/domain), `must` (bool — JD-required, floats to top), `learning` (bool — a topic you can't yet fully defend; shows a "learning" badge), `depth` (`quick`/`standard`/`deep`), `rank` (int; lower = higher), `sources` (url; comma-separate multiple), `added` (YYYY-MM-DD — Modes 1 and 3 MUST stamp this on every new topic), `updated` (YYYY-MM-DD, set on `--refresh`), `generated` (bool — `true` until a human edits it). The build shows a "generated N months ago" staleness hint once `updated`/`added` passes 60 days.
 - **Note frontmatter:** `title`, `source` (url/path), `added` (YYYY-MM-DD), `generated: true`.
 - **Suggested backlog:** `interview-prep/suggested.md` — a ranked markdown list `- Title — one-line why` of matched topics not yet generated. The build renders it as a muted "Suggested · not generated" sidebar group; Mode 1 maintains it.
 - **Depth tiers** (control concept richness + question count + number of doc fetches):
@@ -105,3 +105,4 @@ Authoring notes: leave a blank line after `<summary>` and before `</details>` so
 - **Never clobber edits.** If frontmatter `generated:` is missing or `false`, a human edited it — ask before overwriting.
 - **Notes are sacred.** A topic refresh never touches `notes/*.md`.
 - Per-topic re-fetch is opt-in: `--refresh <slug>`, still asking before overwriting an edited file.
+- **`--refresh-stale`**: list topics whose `updated`/`added` date is older than ~90 days and offer (ask before) re-fetching each; stamp `updated:` on refresh.

@@ -93,4 +93,6 @@ skills/interview-prep/            the skill: SKILL.md, USAGE.md, scripts/build.p
 - The **master résumé and your hand-edits are never clobbered**: a topic file
   with `generated: false` (or edited) is left alone — the skill asks first.
 - A topic refresh **never touches your notes**.
-- Per-topic re-fetch is opt-in: `--refresh <slug>`.
+- Per-topic re-fetch is opt-in: `--refresh <slug>`. Topics older than ~2 months
+  show a muted "generated N months ago" hint, and `--refresh-stale` offers to
+  re-fetch everything older than ~90 days (asking per topic).
