@@ -32,7 +32,8 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 6. **Per-edit triage, conversationally.** Walk proposed edits with the user in batches (old→new, why, flags). **Truthfulness policy:** only re-surface facts already true; you MAY draft a bullet for a real gap but tag it `% UNVERIFIED — confirm true` and require explicit per-edit approval. Never silently invent. Numbers you don't have become `[QUANTIFY: …]`.
 7. **Write `resume-tailored.tex`** = copy of master + approved edits. **Content only** — never touch the preamble, packages, fonts, or layout.
 8. **Ensure toolchain, then compile:** run `scripts/ensure-toolchain.sh` then `scripts/compile-resume.sh <dir>/resume-tailored.tex`. See **Toolchain** below. The compile script auto-installs missing LaTeX packages, reverts to no PDF on error, and **warns if the PDF exceeds 1 page**.
-9. **Report** the final score, the diff summary, the PDF path, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
+9. **ATS self-check.** The compile script extracts `resume-tailored.txt` from the PDF via `pdftotext` (the text an ATS actually parses). Verify every MUST keyword from `keywords.md` appears in it, case-insensitively; list any that didn't survive (e.g. lost in a glyph/ligature) so they can be re-worded. If `pdftotext` is unavailable the script prints the `brew install poppler` hint — note the check was skipped.
+10. **Report** the final score, the diff summary, the PDF path, the ATS-check result, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
 
 ## Cover letter (optional, on request)
 

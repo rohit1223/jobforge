@@ -105,4 +105,17 @@ if [ -n "$pages" ] && [ "$pages" != "(null)" ]; then
 else
   echo "ℹ page count unavailable (no pdfinfo/mdls); verify length manually."
 fi
+
+# --- ATS text extraction -------------------------------------------------------
+# Emit the text an ATS would parse so keyword survival can be verified.
+if command -v pdftotext >/dev/null 2>&1; then
+  TXT="$DIR/$BASE.txt"
+  if pdftotext -layout "$PDF" "$TXT" 2>/dev/null; then
+    echo "✓ ATS text extraction: $TXT — verify MUST keywords survived"
+  else
+    echo "ℹ pdftotext failed; skipping ATS text extraction."
+  fi
+else
+  echo "ℹ pdftotext not found — 'brew install poppler' to enable the ATS text check."
+fi
 exit 0
