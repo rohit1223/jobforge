@@ -34,6 +34,14 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 8. **Ensure toolchain, then compile:** run `scripts/ensure-toolchain.sh` then `scripts/compile-resume.sh <dir>/resume-tailored.tex`. See **Toolchain** below. The compile script auto-installs missing LaTeX packages, reverts to no PDF on error, and **warns if the PDF exceeds 1 page**.
 9. **Report** the final score, the diff summary, the PDF path, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
 
+## Cover letter (optional, on request)
+
+When the user asks for a cover letter, write `applications/<Company>_<Role>/cover-letter.md` from `job.md` + the tailored resume (fall back to the master if no tailored copy exists):
+
+- **250–350 words**, plain markdown, no letterhead — concrete and specific, never generic filler.
+- Map **2–3 real achievements** from the resume to the JD's top must-haves; name the company and role; close with a direct ask.
+- The Phase 2 **truthfulness policy applies verbatim**: only facts the resume already proves; anything unverifiable is tagged `UNVERIFIED — confirm true` and needs explicit approval; missing numbers become `[QUANTIFY: …]`.
+
 ## Toolchain (auto-install)
 
 `scripts/ensure-toolchain.sh` checks for `pandoc`, `pdflatex`, and `tlmgr`:
