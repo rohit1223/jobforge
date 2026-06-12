@@ -165,6 +165,10 @@ nav a .prog.done{color:var(--must)}
 .quizctl{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
 .quizctl button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:8px 16px;font-size:13px}
 .quizctl button:hover{border-color:var(--accent)}
+.panectl{display:flex;gap:8px;align-items:center;margin:0 0 14px}
+.panectl button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px}
+.panectl button:hover{border-color:var(--accent);color:var(--fg)}
+.panectl .kbd{color:var(--muted);font-size:11px;margin-left:auto}
 """
 
 JS = """
@@ -280,6 +284,33 @@ function quizDone(){
 const qa=document.getElementById('quiz-all'),qw=document.getElementById('quiz-weak');
 if(qa)qa.onclick=()=>startQuiz(false);
 if(qw)qw.onclick=()=>startQuiz(true);
+
+/* --- expand/collapse all per pane --- */
+panes.forEach(p=>{
+  if(p.id==='quizpane')return;
+  const ds=[...p.querySelectorAll('details')];
+  if(!ds.length)return;
+  const row=document.createElement('div');row.className='panectl';
+  row.innerHTML='<button data-x="1">Expand all</button><button data-x="0">Collapse all</button><span class="kbd">j/k topics \\u00b7 / search</span>';
+  const h1=p.querySelector('h1');
+  p.insertBefore(row,h1?h1.nextSibling:p.firstChild);
+  row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ds.forEach(d=>d.open=b.dataset.x==='1')});
+});
+
+/* --- keyboard navigation --- */
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea')){if(e.key==='Escape')e.target.blur();return}
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  if(e.key==='/'){e.preventDefault();if(search){search.focus();search.select()}return}
+  if(e.key==='j'||e.key==='k'){
+    const vis=links.filter(a=>a.style.display!=='none'&&a.offsetParent!==null);
+    if(!vis.length)return;
+    const cur=vis.findIndex(a=>a.classList.contains('active'));
+    let nxt=e.key==='j'?cur+1:cur-1;
+    if(nxt<0)nxt=vis.length-1;if(nxt>=vis.length)nxt=0;
+    show(vis[nxt].dataset.target);vis[nxt].scrollIntoView({block:'nearest'});
+  }
+});
 """
 
 
