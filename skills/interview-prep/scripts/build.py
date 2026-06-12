@@ -177,6 +177,16 @@ nav a .prog.done{color:var(--must)}
   main{padding:60px 20px 40px;max-width:none}
   .panectl .kbd{display:none}
 }
+@media print{
+  :root{--bg:#fff;--panel:#fff;--line:#bbb;--fg:#000;--muted:#555;--accent:#000;--gap:#000;--must:#000}
+  #sidebar,#menu,.panectl,.gradebar,.quizrow{display:none!important}
+  body{display:block;background:#fff;color:#000}
+  main{height:auto;overflow:visible;padding:0;max-width:none}
+  details>summary{color:#000}
+  details,pre,table{break-inside:avoid}
+  pre,code{background:#f4f4f4}
+  a{color:#000;text-decoration:none}
+}
 """
 
 JS = """
@@ -303,6 +313,16 @@ panes.forEach(p=>{
   const h1=p.querySelector('h1');
   p.insertBefore(row,h1?h1.nextSibling:p.firstChild);
   row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ds.forEach(d=>d.open=b.dataset.x==='1')});
+});
+
+/* --- print: open every answer in the active pane, restore after --- */
+let printState=null;
+window.addEventListener('beforeprint',()=>{
+  const p=panes.find(x=>x.classList.contains('active'));if(!p)return;
+  printState=[...p.querySelectorAll('details')].map(d=>{const o=d.open;d.open=true;return [d,o]});
+});
+window.addEventListener('afterprint',()=>{
+  if(printState){printState.forEach(s=>{s[0].open=s[1]});printState=null}
 });
 
 /* --- mobile drawer --- */
