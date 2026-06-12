@@ -1,8 +1,6 @@
 ---
 title: Distributed Systems & Control Planes
 bucket: tech
-must: false
-rank: 6
 sources: https://aws.amazon.com/builders-library/
 depth: standard
 added: 2026-06-08

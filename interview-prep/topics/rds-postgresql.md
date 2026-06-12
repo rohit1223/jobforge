@@ -2,7 +2,6 @@
 title: RDS PostgreSQL
 bucket: tech
 learning: true
-rank: 9
 sources: https://www.postgresql.org/docs/17/, https://docs.aws.amazon.com/AmazonRDS/
 depth: standard
 detailed: true

@@ -1,8 +1,6 @@
 ---
 title: Reliability & Incident Engineering
 bucket: tech
-must: false
-rank: 8
 sources: https://sre.google/sre-book/table-of-contents/
 depth: standard
 added: 2026-06-08

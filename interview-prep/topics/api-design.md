@@ -1,8 +1,6 @@
 ---
 title: API Design & Versioning
 bucket: tech
-must: false
-rank: 7
 sources: https://cloud.google.com/apis/design
 depth: standard
 added: 2026-06-08

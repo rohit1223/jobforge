@@ -1,0 +1,73 @@
+# Job-prep manifest — read by interview-prep/build.py (job switcher view).
+# Topics reference shared interview-prep/topics/<slug>.md; entries whose slug
+# isn't generated yet appear under "Suggested for <job>". Flat key: value lines.
+job: Sensorfact — DevOps Engineer
+topics:
+  - slug: aws-eks
+    must: true
+    rank: 1
+    angle: Their platform runs on AWS EKS — be explicit about EKS specifics (IRSA, managed node groups, ALB controller), not just generic K8s.
+  - slug: terraform
+    must: true
+    rank: 2
+    angle: IaC is a stated must; they layer Terragrunt over Terraform for DRY multi-environment setups.
+  - slug: kubernetes
+    must: true
+    rank: 3
+    angle: EKS-flavoured; expect cluster-ops questions in an IoT data-pipeline context.
+  - slug: cicd
+    must: true
+    rank: 4
+    angle: Their stack is GitLab CI + Argo CD (GitOps) — map your Jenkins pipelines to stages/runners and pull-based CD.
+  - slug: observability
+    must: true
+    rank: 5
+    angle: They run Prometheus + Loki + Tempo + Grafana; bridge from your Grafana/Datadog experience.
+  - slug: reliability-incident
+    must: true
+    rank: 6
+    angle: Setup/maintain/monitor production infra is a top JD must — cost monitoring and predictability too.
+  - slug: distributed-systems
+    rank: 7
+    angle: Microservices + event-driven patterns over MQTT and Kafka.
+  - slug: rds-postgresql
+    rank: 8
+    angle: RDS Postgres is their primary OLTP store.
+  - slug: apache-kafka
+    rank: 9
+    angle: They run Aiven Kafka for IoT ingestion; frame answers from replicated-log first principles.
+  - slug: core-backend
+    rank: 10
+    angle: Their runtime is Node.js, not Java — keep answers language-agnostic and show event-loop awareness.
+  - slug: nodejs
+    title: Node.js
+    rank: 11
+    why: their core runtime — event loop, async patterns, npm ecosystem (gap — learn)
+  - slug: gitlab-ci
+    title: GitLab CI
+    rank: 12
+    why: their CI — .gitlab-ci.yml, runners, stages (you bring Jenkins) (gap — learn)
+  - slug: argo-cd-gitops
+    title: Argo CD & GitOps
+    rank: 13
+    why: their CD — Application CRD, sync/drift/self-heal (gap — learn)
+  - slug: terragrunt
+    title: Terragrunt
+    rank: 14
+    why: DRY multi-env layer over your Terraform strength (gap — learn)
+  - slug: clickhouse
+    title: ClickHouse
+    rank: 15
+    why: columnar OLAP, MergeTree engine — Altinity ClickHouse in their stack (gap — learn)
+  - slug: mqtt-emqx
+    title: MQTT & EMQX
+    rank: 16
+    why: IoT pub/sub, QoS levels, retained messages (gap — learn)
+  - slug: serverless-event-driven
+    title: Serverless & Event-driven Architecture
+    rank: 17
+    why: patterns the role values (gap — learn)
+  - slug: industrial-iot-energy-monitoring
+    title: Industrial IoT & Energy Monitoring
+    rank: 18
+    why: domain context for their product (gap — learn)

@@ -1,8 +1,6 @@
 ---
 title: Redis & Caching
 bucket: tech
-must: false
-rank: 3
 sources: https://redis.io/docs/, https://github.com/redis/docs
 depth: deep
 detailed: true

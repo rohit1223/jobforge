@@ -1,8 +1,6 @@
 ---
 title: Observability & Monitoring
 bucket: tech
-must: true
-rank: 5
 sources: https://prometheus.io/docs/introduction/overview/
 depth: standard
 added: 2026-06-08

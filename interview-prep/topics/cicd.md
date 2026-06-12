@@ -1,8 +1,6 @@
 ---
 title: CI/CD & Pipelines
 bucket: tech
-must: true
-rank: 4
 sources: https://www.jenkins.io/doc/
 depth: standard
 added: 2026-06-08

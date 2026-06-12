@@ -84,24 +84,90 @@ def collect(sub):
     return items
 
 
-def topic_key(it):
+def topic_key(it, must_any=frozenset(), minrank=None):
     m = it["meta"]
     try:
         rank = int(m.get("rank", "9999"))
     except ValueError:
         rank = 9999
+    if minrank:
+        rank = min(rank, minrank.get(it["slug"], 9999))
+    must = truthy(m.get("must")) or it["slug"] in must_any
     return (
-        0 if truthy(m.get("must")) else 1,
+        0 if must else 1,
         0 if truthy(m.get("learning")) else 1,
         rank,
-        it["meta"]["title"].lower(),
+        m["title"].lower(),
     )
 
 
-def badge(it):
+def parse_prep(path):
+    """Parse a job's prep.yml — flat keys plus a `topics:` list of entries.
+
+    Tolerant line-based parser (no YAML lib): `- slug: x` starts an entry;
+    indented `key: value` lines extend it; unindented ones are job-level.
+    """
+    job = {"topics": []}
+    cur = None
+    with open(path, encoding="utf-8") as f:
+        for raw in f:
+            line = raw.rstrip("\n")
+            s = line.strip()
+            if not s or s.startswith("#"):
+                continue
+            if s.startswith("- "):
+                cur = {}
+                job["topics"].append(cur)
+                s = s[2:].strip()
+                if not s:
+                    continue
+            if ":" not in s:
+                continue
+            k, _, v = s.partition(":")
+            k, v = k.strip(), v.split(" #", 1)[0].strip().strip("\"'")
+            if cur is not None and line[:1] in (" ", "\t"):
+                cur[k] = v
+            elif k == "topics":
+                cur = None
+            else:
+                cur = None
+                job[k] = v
+    return job
+
+
+def collect_jobs():
+    """Read applications/*/prep.yml into job-prep manifests."""
+    root = os.path.dirname(os.path.abspath(DATADIR))
+    jobs = []
+    for path in sorted(glob.glob(os.path.join(root, "applications", "*", "prep.yml"))):
+        j = parse_prep(path)
+        j["dir"] = os.path.basename(os.path.dirname(path))
+        j.setdefault("job", j["dir"].replace("_", " — "))
+        for t in j["topics"]:
+            t["slug"] = t.get("slug") or slugify(t.get("title", ""))
+        jobs.append(j)
+    return jobs
+
+
+def job_aggregates(jobs):
+    """All-view weighting: a topic is `must` if any job says so; rank = min across jobs."""
+    must_any, minrank = set(), {}
+    for j in jobs:
+        for t in j["topics"]:
+            if truthy(t.get("must")):
+                must_any.add(t["slug"])
+            try:
+                r = int(t.get("rank", "9999"))
+            except ValueError:
+                r = 9999
+            minrank[t["slug"]] = min(minrank.get(t["slug"], 9999), r)
+    return must_any, minrank
+
+
+def badge(it, must_any=frozenset()):
     m = it["meta"]
     out = ""
-    if truthy(m.get("must")):
+    if truthy(m.get("must")) or it["slug"] in must_any:
         out += '<span class="badge must">must</span>'
     if truthy(m.get("learning")):
         out += '<span class="badge learning">learning</span>'
@@ -445,7 +511,10 @@ def read_suggested():
 
 
 def build():
-    topics = sorted(collect("topics"), key=topic_key)
+    jobs = collect_jobs()
+    must_any, minrank = job_aggregates(jobs)
+    topics = sorted(collect("topics"),
+                    key=lambda it: topic_key(it, must_any, minrank))
     notes = sorted(collect("notes"), key=lambda it: it["meta"]["title"].lower())
     suggested = read_suggested()
 
@@ -466,8 +535,10 @@ def build():
         nav.append(f'<div class="group">{html.escape(group)}</div><nav>')
         for it in items:
             pid = f"{idprefix}-{it['slug']}"
+            amust = ' data-must="1"' if (truthy(it["meta"].get("must")) or it["slug"] in must_any) else ""
             nav.append(
-                f'<a data-target="{html.escape(pid)}">{html.escape(it["meta"]["title"])}{badge(it)}</a>'
+                f'<a data-target="{html.escape(pid)}" data-slug="{html.escape(it["slug"])}"{amust}>'
+                f'{html.escape(it["meta"]["title"])}{badge(it, must_any)}</a>'
             )
             src = it["meta"].get("source") or it["meta"].get("sources")
             cite = ""

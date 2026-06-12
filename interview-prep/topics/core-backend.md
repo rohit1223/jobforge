@@ -1,8 +1,6 @@
 ---
 title: Core Backend (Java & Python)
 bucket: tech
-must: false
-rank: 10
 sources: https://docs.oracle.com/en/java/javase/21/
 depth: standard
 added: 2026-06-08

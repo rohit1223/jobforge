@@ -2,7 +2,6 @@
 title: Apache Kafka
 bucket: tech
 learning: true
-rank: 8
 sources: https://kafka.apache.org/documentation/, https://github.com/apache/kafka
 depth: deep
 detailed: true
