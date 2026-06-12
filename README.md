@@ -17,7 +17,8 @@ applications/<Company>_<Role>/     One folder per job, holding generated artifac
   ├── resume-tailored.pdf            compiled output
   ├── resume-tailored.txt            ATS text extraction (pdftotext) for keyword checks
   ├── cover-letter.md                optional, on request
-  └── status.yml                     stage / applied / next_interview (tracker pane)
+  ├── status.yml                     stage / applied / next_interview (tracker pane)
+  └── prep.yml                       job-prep manifest (drives the dashboard's job switcher)
 interview-prep/                    Global, repo-wide study dashboard (not job-specific):
   ├── topics/<slug>.md               one per topic (derived from keywords + gaps)
   ├── notes/<slug>.md                one per note (from a URL or local doc)
@@ -79,7 +80,7 @@ if the result spills past one page.
 
 A second skill, `interview-prep`, builds a single self-contained SPA
 (`interview-prep/index.html`) for **senior-level revision of topics you can
-defend**. One skill, four modes:
+defend**. One skill, five modes:
 
 - **Build / refresh** — derives matched, resume-proven topics (JD-required
   first), sources official docs (Context7 first, WebSearch+Fetch fallback), and
@@ -92,9 +93,15 @@ defend**. One skill, four modes:
   source into a note section.
 - **Mock interview** (`mock <topic|all>`) — get interviewed in chat, one
   question at a time, graded against the model answers, with a weak-areas log.
+- **Prep for a job** (`prep-for <Company_Role>`) — writes the per-job
+  `prep.yml` manifest (topics, musts, order, one-line angles) behind the
+  dashboard's **job switcher**.
 
-The dashboard itself tracks **self-quiz progress** (grade each answer; stored
-in localStorage), runs **shuffled quiz / weak-only flashcard sessions**, has
+The dashboard itself has a **job switcher** (pick a role to see only its
+topics, must-first in its own order, with job-specific angle callouts and a
+job-scoped quiz — shared topics reuse one content file and one progress store
+across jobs), tracks **self-quiz progress** (grade each answer; stored in
+localStorage), runs **shuffled quiz / weak-only flashcard sessions**, has
 full-content search, keyboard navigation, a printable cheat-sheet mode, a
 mobile drawer layout, staleness hints on old topics, and an **Applications
 tracker** pane fed by `applications/*/status.yml` (stage + next-interview
