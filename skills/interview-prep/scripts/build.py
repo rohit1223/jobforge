@@ -177,8 +177,15 @@ function show(id){
 }
 links.forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.dataset.target)}));
 const search=document.getElementById('search');
-if(search)search.addEventListener('input',()=>{const q=search.value.toLowerCase();
-  links.forEach(a=>a.style.display=a.textContent.toLowerCase().includes(q)?'':'none')});
+const paneText={};panes.forEach(p=>paneText[p.id]=p.textContent.toLowerCase());
+if(search)search.addEventListener('input',()=>{
+  const q=search.value.trim().toLowerCase();
+  links.forEach(a=>{
+    const hit=!q||a.textContent.toLowerCase().includes(q)||(paneText[a.dataset.target]||'').includes(q);
+    a.style.display=hit?'':'none';
+  });
+  if(q)document.querySelectorAll('details.navgroup').forEach(d=>{d.open=true});
+});
 const first=(location.hash&&document.getElementById(location.hash.slice(1)))?location.hash.slice(1):(panes[0]&&panes[0].id);
 if(first)show(first);
 function copyEl(id,btn){var el=document.getElementById(id);if(!el)return;var text=el.textContent;
