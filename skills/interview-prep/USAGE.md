@@ -5,7 +5,7 @@ reports. Senior-level revision of topics you can defend, plus on-demand deep
 dives on any topic. Everything renders into one offline HTML page:
 `interview-prep/index.html`.
 
-## The four modes
+## The five modes
 
 ### 1. Build / refresh the dashboard
 Derives **matched, résumé-proven** topics (JD-required first), and generates the
@@ -46,6 +46,18 @@ answer with specific feedback, and a session log of weak areas saved under
 
 - Defaults to 8 questions; `all` weights sampling toward `must`/`learning` topics.
 
+### 5. Prep for a specific job  (`prep-for`)
+Creates `applications/<Company>_<Role>/prep.yml` from that job's keyword
+analysis — which shared topics matter for *this* role, which are musts, their
+order, and a one-line *angle* per topic (how their stack maps to your
+experience). The dashboard's **job switcher** is driven by these files.
+
+> "prep-for Sensorfact_DevOpsEngineer" · "prep me for the Acme SRE role"
+
+Topics are shared across jobs: two roles needing Kubernetes reuse the same
+topic (and your quiz progress on it) — only ordering, musts, angles, and the
+job's suggested gaps differ.
+
 ## Depth tiers
 
 | Tier | Questions | Concepts | Doc fetches |
@@ -64,6 +76,12 @@ examples. Best for unfamiliar topics; on by default for `learning` topics.
   grouped by bucket when there's more than one), Notes, the **Suggested**
   backlog, and the **Applications** tracker. The **Filter** box searches full
   topic content, not just titles.
+- **Job switcher** (dropdown at the top) — pick a job to see only that role's
+  topics, must-first in its own order, each with a job-specific *angle*
+  callout; Suggested narrows to that job's missing topics and **Quiz me /
+  Weak only quiz only that job's questions**. "All topics" restores the
+  global view; your choice is remembered. Badges and quiz progress are shared
+  across jobs because the topics themselves are shared.
 - **Self-grading** — every revealed answer has ✓ Knew it / ~ Shaky / ✗ Missed
   buttons. Grades persist in your browser (localStorage); each topic shows a
   `known/total` counter in the sidebar that turns green when complete.

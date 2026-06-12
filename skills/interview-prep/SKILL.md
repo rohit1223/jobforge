@@ -1,11 +1,11 @@
 ---
 name: interview-prep
-description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Four modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], add-note, and mock <topic|all> (interactive mock interview graded against the topics' model answers). Use when the user wants to revise/prep for interviews, deepen or explore a topic, build a study dashboard, be mock-interviewed, or add a note from a link/document. See USAGE.md for the user-facing guide.
+description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Five modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], add-note, mock <topic|all> (interactive mock interview graded against the topics' model answers), and prep-for <Company_Role> (writes the per-job prep.yml manifest behind the dashboard's job switcher, reusing shared topics across jobs). Use when the user wants to revise/prep for interviews, prep for a specific job/role, deepen or explore a topic, build a study dashboard, be mock-interviewed, or add a note from a link/document. See USAGE.md for the user-facing guide.
 ---
 
 # interview-prep
 
-A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, four modes:** build/refresh the dashboard, add a topic, add a note, and a mock interview.
+A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, five modes:** build/refresh the dashboard, add a topic, add a note, a mock interview, and `prep-for` (a per-job manifest powering the dashboard's job switcher).
 
 > **Scope note:** This skill is for *revision of what you match*, not closing gaps. Pure gaps (tools you haven't used) are out of scope here and belong to a separate topic-learning mode. Only include topics the resume genuinely demonstrates.
 
@@ -19,7 +19,8 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
   └── index.html         # generated build artifact (gitignored)
   ```
 - **Build:** `python3 skills/interview-prep/scripts/build.py interview-prep` renders every `.md` (via `pandoc`) into one self-contained `index.html` (inline CSS/JS, sidebar nav, collapsible Q&A). Run it after any `.md` change.
-- **Topic frontmatter:** `title`, `bucket` (tech/soft/experience/domain), `must` (bool — JD-required, floats to top), `learning` (bool — a topic you can't yet fully defend; shows a "learning" badge), `depth` (`quick`/`standard`/`deep`), `rank` (int; lower = higher), `sources` (url; comma-separate multiple), `added` (YYYY-MM-DD — Modes 1 and 3 MUST stamp this on every new topic), `updated` (YYYY-MM-DD, set on `--refresh`), `generated` (bool — `true` until a human edits it). The build shows a "generated N months ago" staleness hint once `updated`/`added` passes 60 days.
+- **Topic frontmatter (intrinsic fields only):** `title`, `bucket` (tech/soft/experience/domain), `learning` (bool — a topic you can't yet fully defend; shows a "learning" badge), `depth` (`quick`/`standard`/`deep`), `sources` (url; comma-separate multiple), `added` (YYYY-MM-DD — Modes 1 and 3 MUST stamp this on every new topic), `updated` (YYYY-MM-DD, set on `--refresh`), `generated` (bool — `true` until a human edits it). The build shows a "generated N months ago" staleness hint once `updated`/`added` passes 60 days. **`must` and `rank` are job-relative and live in `prep.yml`, not topic frontmatter.**
+- **Job-prep manifest:** `applications/<Company>_<Role>/prep.yml` — `job:` display name + `topics:` list of entries `slug`, `must` (bool), `rank` (int), `angle` (one-line job-specific framing shown as a callout in that job's view); not-yet-generated entries carry `title` + `why` and appear as "Suggested for this job". The dashboard's job switcher is driven entirely by these files; the All view aggregates them (must in any job, min rank).
 - **Note frontmatter:** `title`, `source` (url/path), `added` (YYYY-MM-DD), `generated: true`.
 - **Suggested backlog:** `interview-prep/suggested.md` — a ranked markdown list `- Title — one-line why` of matched topics not yet generated. The build renders it as a muted "Suggested · not generated" sidebar group; Mode 1 maintains it.
 - **Depth tiers** (control concept richness + question count + number of doc fetches):
@@ -43,7 +44,7 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
 
 1. Generate **one named topic** — matched OR a gap you want to learn — at the requested depth (default `standard`; see the depth-tier table above for what each controls).
 2. **`--detailed`**: when set, fetch **more concepts** — pull from additional doc sources/Context7 queries and expand the **Core concepts** section with prerequisites/fundamentals and worked examples (the question count still follows `--depth`). Default this **on** for topics flagged `learning` / unfamiliar, since a new topic needs more grounding. Record `detailed: true` in frontmatter.
-3. **Source official docs** per **Doc sourcing**, scaling fetch breadth to depth (and wider when `--detailed`). Write `topics/<slug>.md` (`generated: true`, `depth: <tier>`, `detailed:` if used). If the resume can't yet defend it, set `learning: true` (and omit `must`). Remove it from `suggested.md` if present.
+3. **Source official docs** per **Doc sourcing**, scaling fetch breadth to depth (and wider when `--detailed`). Write `topics/<slug>.md` (`generated: true`, `depth: <tier>`, `detailed:` if used). If the resume can't yet defend it, set `learning: true`. Remove it from `suggested.md` if present; if a `prep.yml` lists the slug as not-yet-generated, it now resolves automatically on rebuild.
 4. **Rebuild** with `build.py`. Not throttled — this is an explicit single topic.
 
 ### Deep content template (this is the quality bar — not an overview)
@@ -92,6 +93,13 @@ Authoring notes: leave a blank line after `<summary>` and before `</details>` so
 2. **Ask ONE question at a time**, phrased as an interviewer would, and wait for the user's answer before continuing. Never dump answers.
 3. **Grade each answer** strong / partial / missed against the model answer, with 1–2 sentences of specific feedback (what was missing or wrong), then ask the next question.
 4. **Close with a session log:** write `notes/mock-log-<slug-or-all>-<YYYY-MM-DD>.md` (frontmatter: `title`, `added`, `generated: true`) summarizing per-question grades and the weak areas to drill, then rebuild with `build.py`. Never modify the topic files themselves.
+
+## Mode 5 — job-prep manifest  (`prep-for <Company_Role>`)
+
+1. Read `applications/<Company_Role>/keywords.md` (+ `gap-report.md` if present). If neither exists, stop and suggest running tailor-application first.
+2. **Map keywords → topic slugs with judgment** (aliases matter: "Prometheus / Loki / Tempo" → `observability`, "Kubernetes (EKS)" → `kubernetes` + `aws-eks`). JD must-tier keywords ⇒ `must: true`; rank by JD weight then resume strength.
+3. Write `applications/<Company_Role>/prep.yml` per the **Job-prep manifest** convention: generated topics get `slug`/`must`/`rank`/`angle` (one line tying *their* stack to the candidate's experience); JD topics with no topic file yet get `slug`/`title`/`rank`/`why` so they appear under "Suggested for this job". If a `prep.yml` already exists, ask before overwriting.
+4. **Rebuild** with `build.py` and tell the user the job is now selectable in the dashboard's job switcher.
 
 ## Doc sourcing (Context7 first)
 
