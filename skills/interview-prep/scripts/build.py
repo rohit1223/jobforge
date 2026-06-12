@@ -167,6 +167,7 @@ details>*:not(summary){padding-left:16px;padding-right:16px}
 details>*:last-child{padding-bottom:12px}
 .qcount{color:var(--muted);font-size:12px;margin:-6px 0 14px}
 .stale{color:#ffb84d}
+.soon{color:var(--gap);font-weight:600}
 .empty{color:var(--muted);margin-top:40px}
 .gradebar{display:flex;gap:8px;align-items:center;border-top:1px dashed var(--line);margin-top:10px;padding:10px 16px 12px;color:var(--muted);font-size:12px}
 .gradebar button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:12px}
@@ -336,6 +337,14 @@ panes.forEach(p=>{
   row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ds.forEach(d=>d.open=b.dataset.x==='1')});
 });
 
+/* --- application tracker countdowns --- */
+document.querySelectorAll('[data-date]').forEach(el=>{
+  const d=new Date(el.dataset.date+'T00:00:00');if(isNaN(d))return;
+  const days=Math.round((d-new Date().setHours(0,0,0,0))/864e5);
+  el.textContent=el.dataset.date+(days>=0?' (in '+days+' day'+(days===1?'':'s')+')':' ('+(-days)+' days ago)');
+  if(days>=0&&days<=7)el.classList.add('soon');
+});
+
 /* --- print: open every answer in the active pane, restore after --- */
 let printState=null;
 window.addEventListener('beforeprint',()=>{
@@ -366,6 +375,45 @@ document.addEventListener('keydown',e=>{
   }
 });
 """
+
+
+def collect_apps():
+    """Read applications/*/status.yml (flat key: value lines) for the tracker pane."""
+    root = os.path.dirname(os.path.abspath(DATADIR))
+    apps = []
+    for path in sorted(glob.glob(os.path.join(root, "applications", "*", "status.yml"))):
+        d = {"dir": os.path.basename(os.path.dirname(path))}
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.split(" #", 1)[0].rstrip()
+                if ":" in line:
+                    k, _, v = line.partition(":")
+                    d[k.strip()] = v.strip().strip("\"'")
+        apps.append(d)
+    apps.sort(key=lambda a: (a.get("next_interview") or "9999-99-99", a.get("stage", "")))
+    return apps
+
+
+def apps_pane(apps):
+    rows = []
+    for a in apps:
+        company = html.escape(a.get("company") or a["dir"])
+        if a.get("url"):
+            company = f'<a href="{html.escape(a["url"])}" target="_blank" rel="noopener">{company}</a>'
+        ni = html.escape(a.get("next_interview", ""))
+        ni_td = f'<td data-date="{ni}">{ni}</td>' if ni else "<td></td>"
+        rows.append(
+            f'<tr><td>{company}</td><td>{html.escape(a.get("role", ""))}</td>'
+            f'<td>{html.escape(a.get("stage", ""))}</td><td>{html.escape(a.get("applied", ""))}</td>'
+            f'{ni_td}<td>{html.escape(a.get("notes", ""))}</td></tr>'
+        )
+    return (
+        '<section class="pane" id="apps-tracker"><h1>Applications</h1>'
+        '<p class="sub">from <code>applications/*/status.yml</code> — update stage / next_interview there</p>'
+        '<table><thead><tr><th>Company</th><th>Role</th><th>Stage</th><th>Applied</th>'
+        '<th>Next interview</th><th>Notes</th></tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody></table></section>'
+    )
 
 
 def read_suggested():
@@ -459,6 +507,12 @@ def build():
     else:
         emit("Topics", topics, idprefix="topics")
     emit("Notes", notes, idprefix="notes")
+
+    apps = collect_apps()
+    if apps:
+        nav.append('<div class="group">Applications</div><nav>'
+                   f'<a data-target="apps-tracker">Tracker <span class="prog">{len(apps)}</span></a></nav>')
+        panes.append(apps_pane(apps))
 
     # Suggested-but-not-generated: collapsible groups by origin (résumé first,
     # then JD — file order preserved). Each item opens a pane with copy-able
