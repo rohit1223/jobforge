@@ -1,11 +1,11 @@
 ---
 name: interview-prep
-description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Three modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], and add-note. Use when the user wants to revise/prep for interviews, deepen or explore a topic, build a study dashboard, or add a note from a link/document. See USAGE.md for the user-facing guide.
+description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Four modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], add-note, and mock <topic|all> (interactive mock interview graded against the topics' model answers). Use when the user wants to revise/prep for interviews, deepen or explore a topic, build a study dashboard, be mock-interviewed, or add a note from a link/document. See USAGE.md for the user-facing guide.
 ---
 
 # interview-prep
 
-A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, two modes:** build/refresh the dashboard, and add a note.
+A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, four modes:** build/refresh the dashboard, add a topic, add a note, and a mock interview.
 
 > **Scope note:** This skill is for *revision of what you match*, not closing gaps. Pure gaps (tools you haven't used) are out of scope here and belong to a separate topic-learning mode. Only include topics the resume genuinely demonstrates.
 
@@ -85,6 +85,13 @@ Authoring notes: leave a blank line after `<summary>` and before `</details>` so
 1. **Fetch/convert:** public URL → `WebFetch`; `.md`/`.txt` → read directly; `.docx` → `pandoc`; `.pdf` → `pdftotext` (install poppler if missing: `brew install poppler`). Auth-gated sources → ask the user to paste/export.
 2. **Distill 80/20**, doc-grounded, into `notes/<slug>.md` (`generated: true`), citing the `source`. Same right-pane shape; appears under the sidebar **Notes** group. (Notes may use the same collapsible Q&A blocks where useful.)
 3. **Rebuild** with `build.py`.
+
+## Mode 4 — mock interview  (`mock <topic|all> [--count N]`)
+
+1. **Source questions** from the `<details>` self-quiz blocks of `interview-prep/topics/<slug>.md`. `all` samples across topics, weighted toward `must` and `learning` ones. Default `--count 8`. Realistic improvised follow-ups are fine, but stay grounded in the topic files' content.
+2. **Ask ONE question at a time**, phrased as an interviewer would, and wait for the user's answer before continuing. Never dump answers.
+3. **Grade each answer** strong / partial / missed against the model answer, with 1–2 sentences of specific feedback (what was missing or wrong), then ask the next question.
+4. **Close with a session log:** write `notes/mock-log-<slug-or-all>-<YYYY-MM-DD>.md` (frontmatter: `title`, `added`, `generated: true`) summarizing per-question grades and the weak areas to drill, then rebuild with `build.py`. Never modify the topic files themselves.
 
 ## Doc sourcing (Context7 first)
 

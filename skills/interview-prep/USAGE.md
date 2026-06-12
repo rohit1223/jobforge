@@ -5,7 +5,7 @@ reports. Senior-level revision of topics you can defend, plus on-demand deep
 dives on any topic. Everything renders into one offline HTML page:
 `interview-prep/index.html`.
 
-## The three modes
+## The four modes
 
 ### 1. Build / refresh the dashboard
 Derives **matched, résumé-proven** topics (JD-required first), and generates the
@@ -35,6 +35,16 @@ Point it at a public URL or a local file (`.md/.txt/.pdf/.docx`). It distills th
 source (80/20) into a note section under **Notes**.
 
 > "add a note from https://… " · "add-note ./papers/raft.pdf"
+
+### 4. Mock interview  (`mock`)
+Get interviewed in chat on any generated topic (or all of them): one question
+at a time, your answer graded strong / partial / missed against the model
+answer with specific feedback, and a session log of weak areas saved under
+**Notes** at the end.
+
+> "mock me on Kafka" · "mock interview, 10 questions across all topics"
+
+- Defaults to 8 questions; `all` weights sampling toward `must`/`learning` topics.
 
 ## Depth tiers
 
