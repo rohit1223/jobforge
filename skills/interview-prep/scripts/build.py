@@ -169,6 +169,14 @@ nav a .prog.done{color:var(--must)}
 .panectl button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:6px;padding:4px 10px;font-size:12px}
 .panectl button:hover{border-color:var(--accent);color:var(--fg)}
 .panectl .kbd{color:var(--muted);font-size:11px;margin-left:auto}
+#menu{display:none}
+@media(max-width:768px){
+  #menu{display:block;position:fixed;top:10px;left:10px;z-index:30;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:8px;padding:6px 12px;font-size:16px}
+  #sidebar{position:fixed;left:0;top:0;z-index:20;transform:translateX(-100%);transition:transform .2s ease;box-shadow:4px 0 24px rgba(0,0,0,.5)}
+  body.nav-open #sidebar{transform:none}
+  main{padding:60px 20px 40px;max-width:none}
+  .panectl .kbd{display:none}
+}
 """
 
 JS = """
@@ -296,6 +304,11 @@ panes.forEach(p=>{
   p.insertBefore(row,h1?h1.nextSibling:p.firstChild);
   row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ds.forEach(d=>d.open=b.dataset.x==='1')});
 });
+
+/* --- mobile drawer --- */
+const menu=document.getElementById('menu');
+if(menu)menu.addEventListener('click',()=>document.body.classList.toggle('nav-open'));
+links.forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('nav-open')));
 
 /* --- keyboard navigation --- */
 document.addEventListener('keydown',e=>{
@@ -441,6 +454,7 @@ def build():
 <title>Interview Prep Dashboard</title>
 <style>{CSS}</style></head>
 <body>
+<button id="menu" aria-label="Toggle navigation">☰</button>
 <aside id="sidebar">
 <h1>Interview Prep</h1>
 <p class="sub">{total} section{"s" if total != 1 else ""} · {total_q} questions</p>
