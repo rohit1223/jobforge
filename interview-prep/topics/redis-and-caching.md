@@ -6,6 +6,7 @@ rank: 3
 sources: https://redis.io/docs/, https://github.com/redis/docs
 depth: deep
 detailed: true
+added: 2026-06-12
 generated: true
 ---
 

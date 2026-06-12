@@ -6,6 +6,7 @@ gap: false
 rank: 2
 sources: https://developer.hashicorp.com/terraform/docs
 depth: standard
+added: 2026-06-08
 generated: true
 ---
 

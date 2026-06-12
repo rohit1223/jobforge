@@ -6,6 +6,7 @@ rank: 8
 sources: https://kafka.apache.org/documentation/, https://github.com/apache/kafka
 depth: deep
 detailed: true
+added: 2026-06-12
 generated: true
 ---
 

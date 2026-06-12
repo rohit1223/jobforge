@@ -5,6 +5,7 @@ must: true
 rank: 3
 sources: https://kubernetes.io/docs/concepts/
 depth: standard
+added: 2026-06-08
 generated: true
 ---
 

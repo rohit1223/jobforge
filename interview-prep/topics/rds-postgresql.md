@@ -6,6 +6,7 @@ rank: 9
 sources: https://www.postgresql.org/docs/17/, https://docs.aws.amazon.com/AmazonRDS/
 depth: standard
 detailed: true
+added: 2026-06-12
 generated: true
 ---
 

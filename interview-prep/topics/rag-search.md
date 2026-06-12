@@ -5,6 +5,7 @@ must: false
 rank: 9
 sources: https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html
 depth: standard
+added: 2026-06-08
 generated: true
 ---
 

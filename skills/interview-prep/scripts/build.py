@@ -9,6 +9,7 @@ escaped <pre> so the build never hard-fails.
 
 Usage: python3 build.py [datadir]   (datadir defaults to "interview-prep")
 """
+import datetime
 import glob
 import html
 import os
@@ -51,6 +52,25 @@ def md_to_html(body):
 
 def truthy(v):
     return str(v).lower() in ("1", "true", "yes", "y")
+
+
+STALE_DAYS = 60
+
+
+def stale_hint(meta, slug):
+    """Muted reminder when a generated topic's docs are getting old."""
+    d = (meta.get("updated") or meta.get("added") or "").strip()
+    try:
+        dt = datetime.date.fromisoformat(d)
+    except ValueError:
+        return ""
+    days = (datetime.date.today() - dt).days
+    if days <= STALE_DAYS:
+        return ""
+    months = days // 30
+    when = f"{months} month{'s' if months != 1 else ''}" if months else f"{days} days"
+    return (f'<p class="sub stale">generated {when} ago — consider '
+            f'<code>--refresh {html.escape(slug)}</code></p>')
 
 
 def collect(sub):
@@ -146,6 +166,7 @@ details>summary:hover{background:rgba(77,163,255,.06)}
 details>*:not(summary){padding-left:16px;padding-right:16px}
 details>*:last-child{padding-bottom:12px}
 .qcount{color:var(--muted);font-size:12px;margin:-6px 0 14px}
+.stale{color:#ffb84d}
 .empty{color:var(--muted);margin-top:40px}
 .gradebar{display:flex;gap:8px;align-items:center;border-top:1px dashed var(--line);margin-top:10px;padding:10px 16px 12px;color:var(--muted);font-size:12px}
 .gradebar button{cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:6px;padding:4px 10px;font-size:12px}
@@ -413,9 +434,10 @@ def build():
             nq = it["html"].count("<details>")
             qline = (f'<p class="qcount">{nq} self-quiz question{"s" if nq != 1 else ""}</p>'
                      if nq else "")
+            stale = stale_hint(it["meta"], it["slug"])
             panes.append(
                 f'<section class="pane" id="{html.escape(pid)}">'
-                f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{qline}{it["html"]}</section>'
+                f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{stale}{qline}{it["html"]}</section>'
             )
         nav.append("</nav>")
 

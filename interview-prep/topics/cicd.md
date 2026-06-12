@@ -5,6 +5,7 @@ must: true
 rank: 4
 sources: https://www.jenkins.io/doc/
 depth: standard
+added: 2026-06-08
 generated: true
 ---
 

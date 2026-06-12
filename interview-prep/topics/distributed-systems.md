@@ -5,6 +5,7 @@ must: false
 rank: 6
 sources: https://aws.amazon.com/builders-library/
 depth: standard
+added: 2026-06-08
 generated: true
 ---
 
