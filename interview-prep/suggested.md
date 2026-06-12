@@ -5,7 +5,6 @@ Résumé topics first, then JD topics. Click any in the dashboard for a copy-abl
 prompt, or run `add-topic <name>` (add `--detailed` for unfamiliar ones).
 
 ## From your résumé
-- Redis & Caching — eviction, persistence, clustering; ties to your Redis state-tier live-migration
 - SQL & Data Modeling — indexing, query plans, transactions/isolation; you list SQL
 - Linux & Systems Fundamentals — processes, cgroups/namespaces, fds, signals; underpins your container & infra work
 - Networking (TCP/TLS/HTTP) — load balancing, keep-alive, TLS handshake; matches your ALB/Route 53/mTLS work
@@ -23,10 +22,8 @@ prompt, or run `add-topic <name>` (add `--detailed` for unfamiliar ones).
 - GitLab CI — .gitlab-ci.yml, runners, stages; Sensorfact's CI (your CI/CD is Jenkins)
 - Argo CD & GitOps — Application CRD, sync / drift / self-heal; Sensorfact's CD
 - Prometheus / Grafana / Loki / Tempo — Sensorfact's observability stack (you have Grafana/Datadog)
-- Apache Kafka — topics, partitions, consumer groups, delivery semantics; Aiven Kafka at Sensorfact
 - ClickHouse — columnar OLAP, MergeTree engine; Altinity ClickHouse at Sensorfact
 - MQTT & EMQX — pub/sub, QoS levels, retained messages; Sensorfact's IoT messaging
 - Terragrunt — DRY multi-environment Terraform; Sensorfact's IaC layer
-- RDS PostgreSQL — managed Postgres, replication, tuning; Sensorfact's primary database
 - Serverless & Event-driven Architecture — patterns Sensorfact values in the role
 - Industrial IoT & Energy Monitoring — Sensorfact's domain context
