@@ -8,7 +8,9 @@ tracked in this repo yet discoverable by Claude Code.
 ## Layout
 
 ```
-master/resume.tex                  Canonical resume — the single source of truth. Edit this.
+master/resume.tex                  Canonical resume — edited only by the update-master skill.
+master/bullet-bank.md              Reusable, sourced resume lines (skill-owned; promoted into resume.tex).
+master/additional-context/         Read-only source-of-record dir (brag-docs/.md tracked, promo *.pdf gitignored).
 applications/<Company>_<Role>/     One folder per job, holding generated artifacts:
   ├── job.md                         the posting (fetched or pasted)
   ├── keywords.md                    bucketed must-have / nice-to-have keywords
@@ -26,6 +28,7 @@ interview-prep/                    Global, repo-wide study dashboard (not job-sp
 skills/
   ├── install.sh                     symlinks skills/* into ~/.claude/skills
   ├── tailor-application/            resume↔job tailoring skill
+  ├── update-master/                 master-resume + bullet-bank skill
   └── interview-prep/                interview-prep dashboard + notes skill
 ```
 
@@ -75,6 +78,35 @@ bash skills/tailor-application/scripts/compile-resume.sh \
 
 The compile script auto-installs any missing LaTeX packages via `tlmgr` and warns
 if the result spills past one page.
+
+## Updating the master resume
+
+`tailor-application` never edits the master. A second skill, `update-master`, is the
+**only** thing that does — behind a hard human gate. It turns your raw achievements
+into résumé bullets through a staging bank:
+
+```
+master/additional-context/   ── you drop true source material here (md + promo PDFs)
+        │   sweep            (skill reads the whole dir, writes none of it)
+        ▼
+master/bullet-bank.md        ── structured, reusable, tagged bullets (each cites its source)
+        │   promote          (you approve the exact LaTeX edit; compile-validated, 1-page guard)
+        ▼
+master/resume.tex            ── canonical résumé
+```
+
+Three modes, in Claude Code:
+
+> update my master resume            # sweep additional-context/ → propose bank entries → show diff
+> add this achievement: …            # paste/URL → a new (emerging) bank entry
+> promote the CSRF line to my resume # gated: shows the LaTeX edit, writes resume.tex, recompiles
+
+Ground rules: only facts present in `master/additional-context/` reach the bank as
+`strong`; unsourced/asserted lines are `emerging` and can't be promoted; a missing
+number is `[QUANTIFY: …]` and blocks promotion; the master is compile-validated on
+every promote (a broken master would poison future tailor runs). Bank lines that stay
+`in_master: false` are a reservoir — `tailor-application` can pull one for a specific
+job without ever changing the master.
 
 ## Interview prep
 

@@ -55,6 +55,41 @@ def truthy(v):
     return str(v).lower() in ("1", "true", "yes", "y")
 
 
+def parse_list(v):
+    """Frontmatter list value → [items]. Accepts `a, b` or `[a, b]`."""
+    if not v:
+        return []
+    return [x.strip() for x in str(v).strip().strip("[]").split(",") if x.strip()]
+
+
+def collect_companies(jobs):
+    """Company-level rollup derived from the per-job prep.yml manifests.
+
+    Company key = the dir prefix before the first '_' (e.g. Booking_SRE_II →
+    'Booking'). Returns: comp_topics {company: {slug: {must, rank}}} (rank = min
+    across that company's roles, must = any role marks it), topic_comp {slug:
+    set(company)} for the per-topic tag chips, and comp_label {company: display}.
+    """
+    comp_topics, topic_comp, comp_label = {}, {}, {}
+    for j in jobs:
+        comp = j["dir"].split("_", 1)[0]
+        comp_label.setdefault(comp, comp)
+        cm = comp_topics.setdefault(comp, {})
+        for t in j["topics"]:
+            slug = t["slug"]
+            try:
+                r = int(t.get("rank", "9999"))
+            except ValueError:
+                r = 9999
+            e = cm.get(slug)
+            if e:
+                e["rank"], e["must"] = min(e["rank"], r), e["must"] or truthy(t.get("must"))
+            else:
+                cm[slug] = {"must": truthy(t.get("must")), "rank": r}
+            topic_comp.setdefault(slug, set()).add(comp)
+    return comp_topics, topic_comp, comp_label
+
+
 STALE_DAYS = 60
 
 
@@ -187,7 +222,7 @@ body{display:flex;font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Robo
 #sidebar .sub{color:var(--muted);font-size:12px;margin:0 18px 16px}
 .group{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin:18px 18px 6px}
 nav{display:flex;flex-direction:column}
-nav a{display:flex;align-items:center;gap:6px;padding:7px 18px;color:var(--fg);text-decoration:none;border-left:3px solid transparent;cursor:pointer;font-size:14px}
+nav a{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:7px 18px;color:var(--fg);text-decoration:none;border-left:3px solid transparent;cursor:pointer;font-size:14px}
 nav a:hover{background:rgba(255,255,255,.04)}
 nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);color:#fff}
 .badge{font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 5px;border-radius:6px;letter-spacing:.04em}
@@ -196,6 +231,9 @@ nav a.active{border-left-color:var(--accent);background:rgba(77,163,255,.10);col
 .badge.depth{background:rgba(139,149,163,.14);color:var(--muted)}
 .badge.depth.deep{background:rgba(199,146,234,.16);color:#c792ea}
 .badge.depth.quick{background:rgba(127,209,255,.14);color:#7fd1ff}
+.badge.company{background:rgba(77,163,255,.13);color:var(--accent);text-transform:none;letter-spacing:0;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 16px}
+.tags .badge.company{font-size:11px;padding:2px 8px}
 details.navgroup{border:none;background:none;border-radius:0;margin:0}
 details.navgroup>summary{padding:14px 18px 6px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;border-bottom:none}
 details.navgroup>summary:hover{background:rgba(255,255,255,.03)}
@@ -295,24 +333,32 @@ const search=document.getElementById('search');
 const paneText={};panes.forEach(p=>paneText[p.id]=p.textContent.toLowerCase());
 if(search)search.addEventListener('input',()=>applyJob());
 
-/* --- job switcher: one source of truth for sidebar visibility ------------- */
+/* --- job / company switcher: one source of truth for sidebar visibility --- */
 const jobsel=document.getElementById('jobsel');
 let curJob='';try{curJob=localStorage.getItem('iprep.job.v1')||''}catch(e){}
-if(!(curJob in JOBS))curJob='';
-function jobEntry(slug){return (curJob&&JOBS[curJob]&&JOBS[curJob].topics[slug])||null}
+/* selOf() resolves the dropdown value to a selection: a role (from JOBS) or a
+   `company:<X>` rollup (from COMPANIES). Returns null for the All view. */
+function selOf(v){
+  if(!v)return null;
+  if(v.indexOf('company:')===0){const c=v.slice(8);return (c in COMPANIES)?{mode:'company',label:COMPANIES[c].label,topics:COMPANIES[c].topics}:null}
+  return (v in JOBS)?{mode:'job',label:JOBS[v].label,topics:JOBS[v].topics}:null;
+}
+if(curJob&&!selOf(curJob))curJob='';
+function jobEntry(slug){const s=selOf(curJob);return (s&&s.topics[slug])||null}
 function setMust(a,on){
   let b=a.querySelector('.badge.must');
   if(on&&!b){b=document.createElement('span');b.className='badge must';b.textContent='must';a.insertBefore(b,a.querySelector('.prog'))}
   if(!on&&b)b.remove();
 }
 function applyJob(){
+  const sel=selOf(curJob);
   const q=search?search.value.trim().toLowerCase():'';
   links.forEach(a=>{
     const pid=a.dataset.target;
     const slug=pid.indexOf('topics-')===0?a.dataset.slug:null;
     let vis=true;
-    if(slug&&curJob){
-      const e=jobEntry(slug);
+    if(slug&&sel){
+      const e=sel.topics[slug];
       vis=!!e;
       a.style.order=e?String((e.must?0:1000)+(e.rank||999)):'';
       setMust(a,!!(e&&e.must));
@@ -324,17 +370,16 @@ function applyJob(){
     a.style.display=vis?'':'none';
   });
   document.querySelectorAll('details.navgroup').forEach(d=>{
-    d.style.display=((d.getAttribute('data-job')||'')===curJob)?'':'none';
+    d.style.display=(sel&&sel.mode==='job'&&(d.getAttribute('data-job')||'')===curJob)?'':'none';
     if(q)d.open=true;
   });
   document.querySelectorAll('.angle').forEach(el=>el.remove());
-  if(curJob){
-    const J=JOBS[curJob];
-    Object.keys(J.topics).forEach(slug=>{
-      const e=J.topics[slug];if(!e.angle)return;
+  if(sel&&sel.mode==='job'){
+    Object.keys(sel.topics).forEach(slug=>{
+      const e=sel.topics[slug];if(!e.angle)return;
       const p=document.getElementById('topics-'+slug);if(!p)return;
       const div=document.createElement('div');div.className='angle';
-      const b=document.createElement('strong');b.textContent=J.label+': ';
+      const b=document.createElement('strong');b.textContent=sel.label+': ';
       div.appendChild(b);div.appendChild(document.createTextNode(e.angle));
       const h1=p.querySelector('h1');p.insertBefore(div,h1?h1.nextSibling:p.firstChild);
     });
@@ -410,8 +455,9 @@ function titleOf(pid){const a=links.find(l=>l.dataset.target===pid);return a?a.c
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function startQuiz(weak){
   deck=[];
+  const sel=selOf(curJob);
   Object.keys(quizIndex).forEach(pid=>{
-    if(curJob&&pid.indexOf('topics-')===0&&!JOBS[curJob].topics[pid.slice(7)])return;
+    if(sel&&pid.indexOf('topics-')===0&&!sel.topics[pid.slice(7)])return;
     quizIndex[pid].forEach(q=>deck.push({pid,key:q.key,el:q.el}));
   });
   if(weak)deck=deck.filter(c=>prog[c.key]==='shaky'||prog[c.key]==='missed');
@@ -576,10 +622,19 @@ def read_suggested():
 def build():
     jobs = collect_jobs()
     must_any, minrank = job_aggregates(jobs)
+    comp_topics, topic_comp, comp_label = collect_companies(jobs)
     topics = sorted(collect("topics"),
                     key=lambda it: topic_key(it, must_any, minrank))
     notes = sorted(collect("notes"), key=lambda it: it["meta"]["title"].lower())
     suggested = read_suggested()
+
+    # Merge any explicit `companies:` frontmatter into the derived company tags,
+    # so a topic can be hand-tagged to a company even without a prep.yml entry.
+    for it in topics:
+        for comp in parse_list(it["meta"].get("companies")):
+            topic_comp.setdefault(it["slug"], set()).add(comp)
+            comp_topics.setdefault(comp, {}).setdefault(it["slug"], {"must": False, "rank": 9999})
+            comp_label.setdefault(comp, comp)
 
     nav, panes = [], []
 
@@ -599,9 +654,12 @@ def build():
         for it in items:
             pid = f"{idprefix}-{it['slug']}"
             amust = ' data-must="1"' if (truthy(it["meta"].get("must")) or it["slug"] in must_any) else ""
+            comps = sorted(topic_comp.get(it["slug"], ()))
+            comp_attr = f' data-companies="{html.escape(",".join(comps))}"' if comps else ""
+            comp_chips = "".join(f'<span class="badge company">{html.escape(c)}</span>' for c in comps)
             nav.append(
-                f'<a data-target="{html.escape(pid)}" data-slug="{html.escape(it["slug"])}"{amust}>'
-                f'{html.escape(it["meta"]["title"])}{badge(it, must_any)}</a>'
+                f'<a data-target="{html.escape(pid)}" data-slug="{html.escape(it["slug"])}"{amust}{comp_attr}>'
+                f'{html.escape(it["meta"]["title"])}{badge(it, must_any)}{comp_chips}</a>'
             )
             src = it["meta"].get("source") or it["meta"].get("sources")
             cite = ""
@@ -617,9 +675,10 @@ def build():
             qline = (f'<p class="qcount">{nq} self-quiz question{"s" if nq != 1 else ""}</p>'
                      if nq else "")
             stale = stale_hint(it["meta"], it["slug"])
+            ptags = (f'<div class="tags">{comp_chips}</div>' if comp_chips else "")
             panes.append(
                 f'<section class="pane" id="{html.escape(pid)}">'
-                f'<h1>{html.escape(it["meta"]["title"])}</h1>{cite}{stale}{qline}{it["html"]}</section>'
+                f'<h1>{html.escape(it["meta"]["title"])}</h1>{ptags}{cite}{stale}{qline}{it["html"]}</section>'
             )
         nav.append("</nav>")
 
@@ -738,12 +797,29 @@ def build():
             nav.append("</nav></details>")
 
     jobs_json = json.dumps(jobs_map, ensure_ascii=False).replace("</", "<\\/")
-    job_opts = "".join(
+    # Company rollup payload for the "By company" dropdown filter (only companies
+    # whose topics actually exist as generated files are worth offering).
+    companies_map = {
+        c: {"label": comp_label.get(c, c),
+            "topics": {s: e for s, e in comp_topics[c].items() if s in topic_slugs}}
+        for c in sorted(comp_topics)
+    }
+    companies_map = {c: v for c, v in companies_map.items() if v["topics"]}
+    companies_json = json.dumps(companies_map, ensure_ascii=False).replace("</", "<\\/")
+    comp_opts = "".join(
+        f'<option value="company:{html.escape(c)}">{html.escape(companies_map[c]["label"])}</option>'
+        for c in companies_map
+    )
+    role_opts = "".join(
         f'<option value="{html.escape(j["dir"])}">{html.escape(j.get("job", j["dir"]))}</option>'
         for j in jobs
     )
-    jobsel_html = (f'<select id="jobsel"><option value="">All topics</option>{job_opts}</select>'
-                   if jobs else "")
+    jobsel_html = (
+        f'<select id="jobsel"><option value="">All topics</option>'
+        f'{f"<optgroup label=\"By company\">{comp_opts}</optgroup>" if comp_opts else ""}'
+        f'{f"<optgroup label=\"By role\">{role_opts}</optgroup>" if role_opts else ""}'
+        f'</select>'
+    ) if jobs else ""
 
     body_panes = "".join(panes) or '<p class="empty">No content yet. Run the interview-prep skill to populate topics, or add a note.</p>'
     total = len(topics) + len(notes)
@@ -766,6 +842,7 @@ def build():
 </aside>
 <main>{body_panes}<section class="pane" id="quizpane"></section></main>
 <script>const JOBS={jobs_json};
+const COMPANIES={companies_json};
 {JS}</script>
 </body></html>"""
 

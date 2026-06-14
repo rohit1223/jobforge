@@ -44,9 +44,8 @@ topics:
     rank: 11
     why: their core runtime — event loop, async patterns, npm ecosystem (gap — learn)
   - slug: gitlab-ci
-    title: GitLab CI
     rank: 12
-    why: their CI — .gitlab-ci.yml, runners, stages (you bring Jenkins) (gap — learn)
+    angle: Their CI — frame answers as Jenkins concepts mapped to GitLab keywords (agents/labels → runners/tags, workspace → artifacts/cache, input → manual gates).
   - slug: argo-cd-gitops
     title: Argo CD & GitOps
     rank: 13

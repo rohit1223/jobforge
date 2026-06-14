@@ -1,0 +1,57 @@
+# Job-prep manifest — read by interview-prep/build.py (job switcher view).
+# Topics reference shared interview-prep/topics/<slug>.md; entries whose slug
+# isn't generated yet appear under "Suggested for <job>". Flat key: value lines.
+job: DEPT — Cloud Engineer
+topics:
+  - slug: terraform
+    must: true
+    rank: 1
+    angle: IaC (Terraform) is the named must — lead with your 30-day→8-hour region-build automation that replaced ticket-driven dependencies.
+  - slug: reliability-incident
+    must: true
+    rank: 2
+    angle: Core of the role is "lead infra implementation/migration sprint-0→go-live" and troubleshoot during it — frame your 8-step health-checked live-migration workflow and staged 34-region rollouts.
+  - slug: observability
+    must: true
+    rank: 3
+    angle: Datadog is JD-named; bridge from your Grafana/Datadog monitoring and incident-context enrichment.
+  - slug: cicd
+    must: true
+    rank: 4
+    angle: JD names Azure DevOps + GitHub — map your Jenkins/automation pipelines to PR-based workflows, runners/agents, and pipeline-as-code.
+  - slug: aws-eks
+    must: true
+    rank: 5
+    angle: AWS satisfies the "and/or" multi-cloud must — cover AWS fundamentals (IAM, VPC, ALB, networking), not just EKS, since this is a platform role.
+  - slug: distributed-systems
+    rank: 6
+    angle: Control-plane and platform design context for building/maintaining cloud platforms.
+  - slug: redis-and-caching
+    rank: 7
+    angle: Your headline live-migration was Redis state-tier — be ready to defend the sequencing, health checks, and 68.4% footprint cut.
+  - slug: api-design
+    rank: 8
+    angle: Platform self-service angle — your V2 admin-plane API and public management APIs show client/developer enablement.
+  - slug: core-backend
+    rank: 9
+    angle: Keep answers language-agnostic; DEPT is an agency serving many stacks, so show breadth over Java specifics.
+  - slug: azure
+    title: Microsoft Azure
+    rank: 10
+    why: JD's first-named cloud — AKS, ARM/Bicep, Entra ID, VNet; not in your resume (gap — learn)
+  - slug: gcp
+    title: Google Cloud Platform (GCP)
+    rank: 11
+    why: JD's third named cloud — GKE, IAM, VPC, Cloud Run (gap — learn)
+  - slug: cloudflare
+    title: Cloudflare
+    rank: 12
+    why: JD-named edge platform — DNS, CDN, WAF, Zero Trust, Workers (gap — learn)
+  - slug: azure-devops
+    title: Azure DevOps
+    rank: 13
+    why: JD-named CI/CD — Pipelines/Repos/Boards; map from your Jenkins (gap — learn)
+  - slug: multi-cloud-architecture
+    title: Multi-cloud Architecture & Migration
+    rank: 14
+    why: revision candidate — portability, landing zones, sprint-0→go-live cutovers from your OCI+AWS work

@@ -107,19 +107,19 @@
 %-----------SUMMARY-----------
 \section{SUMMARY}
 \begin{itemize}[leftmargin=0in, label={}]
-    \small{\item{Software and platform engineer with 9+ years of experience building cloud infrastructure, control planes, internal developer platforms, and AI-assisted operations tooling in large-scale enterprise environments. Proven track record of turning operational bottlenecks into durable engineering systems, including compressing cloud region launch timelines from \textbf{30 days to 8 hours}, lowering state-tier infrastructure usage by \textbf{68.4\%}, and removing recurring on-call toil through automation and self-service. Deep expertise across distributed systems, infrastructure automation, reliability engineering, API design, backend services, and incident tooling, with strong ownership of high-stakes production initiatives.}}
+    \small{\item{Senior software and platform engineer with 9+ years designing and delivering complex, scalable systems --- control planes, distributed services, internal developer platforms, and AI-assisted operations tooling --- in large-scale enterprise environments. Strong grounding in software design principles and scalable systems architecture, with a track record of owning high-stakes features end-to-end and leading engineers through architectural change: compressed cloud region launch timelines from \textbf{30 days to 8 hours}, lowered state-tier infrastructure usage by \textbf{68.4\%}, and removed recurring on-call toil through automation and self-service. Deep expertise across distributed systems, API design, backend services, reliability engineering, and AI-native operations tooling, with strong ownership of production-critical initiatives.}}
 \end{itemize}
 
 %-----------SKILLS-----------
 \section{SKILLS}
 \begin{itemize}[leftmargin=0in, label={}]
     \small{\item{
-     \textbf{Languages}{: Java, Python, Shell Scripting} \\
-     \textbf{Cloud} {: AWS (EKS, ECS, ECR, IAM, ALB, Route 53, VPC), Oracle Cloud Infrastructure (OCI)} \\
-     \textbf{Infrastructure As Code}{: Terraform, Ansible, Chef, Docker, Kubernetes, Jenkins, GitLab, Git} \\
-     \textbf{Backend \& Platform}{: Linux, REST APIs, distributed systems, Kafka, Redis, SQL, infrastructure automation, reliability engineering, incident tooling} \\
-     \textbf{Monitoring}{: Grafana, MQL, JQL, Datadog} \\
-     \textbf{AI \& Search Systems}{: RAG, vector search, BM25, Lucene, embeddings, agentic workflows}
+     \textbf{Languages} {: Java, Python, Shell Scripting; learning Node.js \& TypeScript} \\
+     \textbf{Cloud} {: AWS, Oracle Cloud Infrastructure (OCI), Terraform} \\
+     \textbf{Infrastructure As Code} {: Ansible, Chef, Docker, Kubernetes, Jenkins, Linux, Git} \\
+     \textbf{Backend \& Platform} {: REST API design, software design, distributed systems, control planes, Redis, SQL, infrastructure automation, reliability engineering, incident tooling} \\
+     \textbf{Monitoring} {: Grafana, MQL, JQL, Datadog} \\
+     \textbf{AI \& Search Systems} {: RAG, vector search, BM25, Lucene, embeddings, agentic workflows}
     }}
 \end{itemize}
 
@@ -130,23 +130,26 @@
       {Oracle India Development Center}{2020 -- Present}
       {Member of Technical Staff}{India}
       \resumeItemListStart
-        \resumeItem{Reduced API Gateway new-region build time from \textbf{30 days to 8 hours} by redesigning the build workflow, replacing ticket-driven dependencies with Terraform-based automation, and streamlining policy serialization and tenancy-aware provisioning.}
-        \resumeItem{Led ARM migration and mixed-shape platform validation across \textbf{34 production regions in 4 rollout phases}, enabling API Gateway services to run across x86 and ARM while addressing capacity bottlenecks through performance testing, shard sizing, and production rollout.}
-        \resumeItem{Cut state-tier capacity footprint by \textbf{68.4\% in OC1}, eliminating \textbf{357 cores} and reducing large-region usage from \textbf{63 OCPUs to 18 OCPUs per region}, by building an 8-step automated live-migration workflow for Redis-based state services with health checks, and production grafana dashboards.}
-        \resumeItem{Drove access/setup on-call pages from \textbf{10+/week to 0} by re-architecting the Management-Plane as a production-ready V2 API (cursor pagination, RBAC, mTLS ingress), replacing fragile tunnels with secure management plane APIs--- \textbf{defect-free since early 2025}, running in production across commercial and government realms.}
-        \resumeItem{Powered \textbf{70\%} of the team's customer-query resolutions with an internal operations copilot spanning \textbf{8+ knowledge sources}, reducing indexing time from \textbf{hours to minutes} and held \textbf{retrieval under 9s} through incremental indexing, metadata processing, optimized \textbf{hybrid BM25/vector search}.}
-        \resumeItem{Built the Ops Copilot RCA subsystem for API Gateway on-call to auto-root-cause alarms covering roughly \textbf{80\% of on-call load} at \textbf{~80\% accuracy}, combining ticket context, logs, metrics, and LLM reasoning; redesigned it into a shared background workflow with Object Storage reuse, saving \textbf{~11.7 engineering hours per month} on Sev2/Sev3 follow-up.}
-        \resumeItem{Turned a risky operator-only CSRF workaround into a customer-facing self-service feature addressing \textbf{200+ disablement requests annually} while preserving CSRF protection and auditability and removing recurring on-call intervention.}
-        \resumeItem{Saved \textbf{500+ engineering hours} and improved incident resolution time by \textbf{20\%} by automating Jira alarm-context enrichment across \textbf{75,000+ tickets} by onboarding \textbf{10 teams} to this workflow.}
+        \resumeItem{Reduced OCI API Gateway new-region and new-realm build time from \textbf{30 days to 8 hours} by redesigning the build workflow, replacing ticket-driven dependencies with Terraform-based automation, and streamlining policy serialization and tenancy-aware provisioning.}
+        \resumeItem{Led ARM adoption and mixed-shape platform validation across \textbf{34 production regions in 4 rollout phases}, enabling API Gateway services to run across x86 and ARM while addressing capacity bottlenecks through performance testing, shard sizing, and staged production rollout.}
+        \resumeItem{Cut state-tier capacity footprint by \textbf{68.4\% in OC1}, eliminating \textbf{357 cores} and reducing large-region usage from \textbf{63 OCPUs to 18 OCPUs per region}, by building an 8-step automated live-migration workflow for Redis-based state services with strict sequencing, health checks, and production guardrails.}
+        \resumeItem{Re-architected the Orchestrator admin plane by applying clean software-design principles --- a production-ready V2 API surface spanning \textbf{16 named resources}, modernized pagination and query behavior, and API contracts decoupled from persistence through a DTO layer --- enabling parallel V1/V2 migration without underlying data-model changes.}
+        \resumeItem{Cut access- and setup-related on-call pages from \textbf{10+ per week per UK--India shift to 0} by exposing secure public management APIs, removing tunnel dependencies, and enforcing tenant validation, RBAC, IP-based restrictions, and mTLS ingress.}
+        \resumeItem{Built an internal operations copilot for runbooks, documentation, PDFs, HTML, tables, and multi-team knowledge bases, keeping retrieval latency \textbf{under 9 seconds} and reducing indexing time from \textbf{hours to minutes} through hybrid BM25/vector search, citation-aware responses, batch embeddings, and incremental indexing.}
+        \resumeItem{Saved \textbf{203.5 engineering hours} within API Gateway and improved incident resolution time by \textbf{20\%} by automating Jira alarm-context enrichment across \textbf{2,442 tickets}; onboarded \textbf{6 teams} to the workflow.}
         \resumeItem{Saved approximately \textbf{240 developer hours per month} across \textbf{15 teams} by launching an AI-assisted weekly operations reporting pipeline that clusters incidents, summarizes recurring themes, generates HTML reports, and publishes standardized outputs automatically.}
-        \resumeItem{Prevented \textbf{300+ security tickets} across \textbf{34 production regions} by modernizing the API Gateway performance-testing stack---migrating the suite from legacy Canary to Test Service, upgrading to Java 21 and a new testing framework, retiring legacy instances, and resolving recurring security-review findings.}      \resumeItemListEnd
+        \resumeItem{Modernized the API Gateway performance-testing stack by migrating the entire suite from legacy Canary to Test Service, upgrading to \textbf{Java 21} and a new testing framework, and building the supporting infrastructure; retired legacy instances, resolved recurring security-review findings, and avoided more than \textbf{300 security tickets} across \textbf{34 production regions}.}
+      \resumeItemListEnd
+
+    \newpage
 
     \resumeSubheading
       {UnitedHealth Group}{2017 -- 2020}
       {IO Engineering Analyst}{India}
       \resumeItemListStart
         \resumeItem{Automated end-to-end Pega installation with Python and shell scripting, cutting per-server setup time from \textbf{11 hours to 30 minutes} and removing approximately \textbf{95\%} of manual effort; recognized with the \textbf{Aquamarine Bravo Award for Innovation}.}
-        \resumeItem{Containerized Pega (JBoss/Tomcat, MySQL) and deployed to AWS ECS and EKS---images in ECR, secure networking and access via IAM, ALB, Route 53, and VPC---enabling \textbf{repeatable, self-service environment provisioning}.}        \resumeItem{Designed and deployed a three-tier high-availability web application using Apache HTTPD, Tomcat, and Prevayler, with auto-scaling and configuration management delivered through Docker, Docker Swarm, and Ansible.}
+        \resumeItem{Built customized containerized Pega images on JBoss and Tomcat with MySQL for OpenShift deployment, advancing the platform's containerization strategy and enabling repeatable environment provisioning.}
+        \resumeItem{Designed and deployed a three-tier high-availability web application using Apache HTTPD, Tomcat, and Prevayler, with auto-scaling and configuration management delivered through Docker, Docker Swarm, and Ansible.}
         \resumeItem{Saved \textbf{more than 30 hours of manual work per month} by automating certificate rotation, renewal notifications, and roll-out workflows with Ansible and Python.}
         \resumeItem{Cut go-live environment validation time by \textbf{2.5 hours per environment} by automating health checks across JBoss, WebSphere, and IHS with shell scripts that generated spreadsheet-based readiness reports.}
       \resumeItemListEnd
@@ -160,7 +163,6 @@
     \resumeItemListStart
       \resumeItem{Scaled Ops Copilot from a passion project into a senior-leadership-recognized operations platform adopted by \textbf{15 teams}, driving \textbf{hundreds of hours of monthly time savings} through AI-assisted troubleshooting, ticket enrichment, and reporting automation.}
       \resumeItem{Turned an API Gateway Catalog proof of concept into the foundation for a broader API Developer Portal initiative, strengthening internal developer enablement and platform self-service.}
-      \resumeItem{Recognized as a go-to engineer for AI adoption across API Gateway --- running regular AI workshops and presenting Orchestrator, Ops Copilot, RAG, and MCP work in org- and leadership-facing forums --- with designs and demos reused by on-call and partner teams (Exec, Test, Workflow-as-a-Service).}
       \resumeItem{Recognized with UnitedHealth Group's \textbf{Aquamarine Bravo Award for Innovation} for building a repeatable Pega installation workflow that replaced a lengthy manual process with fast, standardized server provisioning.}
     \resumeItemListEnd
 \resumeSubHeadingListEnd
