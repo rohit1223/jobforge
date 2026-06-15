@@ -175,37 +175,8 @@ third-party marketplaces like this one). When on, Claude Code refreshes at start
 and prompts you to run `/reload-plugins` if anything changed. To disable all
 auto-updating globally: `export DISABLE_AUTOUPDATER=1`.
 
-### If you run it locally (`--plugin-dir`, e.g. you're hacking on it)
-
-No update step needed — you're running the repo directly. `SKILL.md` edits
-hot-reload in-session; after changing `bin/`, manifests, or hooks, run
-`/reload-plugins`. (A local `--plugin-dir` copy also shadows an installed one of
-the same name.)
-
-### Publishing a new version (maintainer)
-
-`plugin.json` sets an explicit `version`, so **pushing commits alone won't reach
-users** — Claude Code keeps the cached copy until the version string changes. On
-each release: **bump `version`** in `.claude-plugin/plugin.json` (currently
-`0.2.3`), commit, push. Then users run the update commands above.
-
-> Iterating fast? Remove the `version` field instead — the plugin then tracks the
-> git commit SHA, so every push is treated as a new version. Add `version` back
-> when you want controlled, semver'd releases.
-
----
-
-## Developing / customizing the plugin
-
-To iterate on the skills locally without re-installing on every change, load the
-repo as a live plugin directory:
-
-```bash
-claude --plugin-dir /path/to/jobforge
-```
-
-Edits to `SKILL.md` files reload in-session; after changing `bin/`, hooks, or
-manifests, run `/reload-plugins`.
+Developing the plugin, testing changes, or publishing a new version? See
+**[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ---
 
