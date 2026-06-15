@@ -47,6 +47,20 @@ It never overwrites existing files. Then **replace `master/resume.tex` with your
 own résumé** (keep the custom commands the template defines — the skills rely on
 them).
 
+### Don't have a LaTeX resume?
+
+`scaffold.sh` already gives you a working ATS template at `master/resume.tex`. To
+fill it from a resume you already have (PDF, Word, Google Docs export, or plain
+text), drop the file in your workspace and ask Claude Code:
+
+> import my resume from ./my-resume.pdf
+
+`update-master`'s import mode (Mode 4) reads it and maps the content into the
+template — keeping the ATS layout, porting only what's actually in your file (no
+fabrication), then compiling to check it. From there `tailor-application` works as
+normal. Prefer to do it by hand? Just edit the placeholders in `master/resume.tex`,
+keeping the `\resumeSubheading` / `\resumeItem` commands the skills expect.
+
 ### 3. Install the LaTeX toolchain (one-time)
 
 ```

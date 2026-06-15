@@ -1,6 +1,6 @@
 ---
 name: update-master
-description: Maintain the master resume from your raw achievements. Sweeps master/additional-context/ (brag-docs, promo PDFs, perf snippets) into a structured, reusable bullet bank, then on an explicit gated step promotes selected bank lines into master/resume.tex and validates the compile. The bank also acts as a reservoir of off-master lines that tailor-application can pull for a specific job. Use when the user wants to update/refresh the master resume, add a new achievement, turn a brag-doc or promo PDF into resume bullets, or grow their reusable resume-line bank.
+description: Maintain the master resume from your raw achievements. Sweeps master/additional-context/ (brag-docs, promo PDFs, perf snippets) into a structured, reusable bullet bank, then on an explicit gated step promotes selected bank lines into master/resume.tex and validates the compile. The bank also acts as a reservoir of off-master lines that tailor-application can pull for a specific job. Use when the user wants to update/refresh the master resume, add a new achievement, turn a brag-doc or promo PDF into resume bullets, grow their reusable resume-line bank, or bootstrap a master by importing an existing PDF/Word/Docs resume into the LaTeX template.
 ---
 
 # update-master
@@ -31,7 +31,9 @@ trace to a real source in `master/additional-context/`. No fabrication, ever.
   parsing. The skill **never writes into this directory.**
 - **Bank (skill-owned):** `master/bullet-bank.md`. Structured entries (schema below).
   Git-tracked; the user may hand-edit but normally doesn't.
-- **Master (high-stakes, gated):** `master/resume.tex`. Written only by *promote*.
+- **Master (high-stakes, gated):** `master/resume.tex`. Written only by *promote*
+  (Mode 3) and the first-run *import* (Mode 4) — both content-only, never the
+  preamble/layout.
 - **Compile command (bundled, reused):** `jobforge-compile` (on PATH while the
   plugin is enabled; wraps tailor-application's compile script).
 
@@ -124,6 +126,39 @@ on the master".
    promoted achievement is one you'll have to defend. Sweeping never touches
    interview-prep; only this deliberate promote step does, and only on yes.
 
+### Mode 4 — Import an existing resume (first-run bootstrap)
+
+Trigger: "import my resume from `<file/url>`", "I don't have a LaTeX resume",
+"create my master from this PDF/Word doc", or invoking the skill when
+`master/resume.tex` is still the unedited scaffold template.
+
+1. **Read the source.** `.pdf` → the Read tool's native PDF parsing (or
+   `pdftotext`); `.docx` → `pandoc <file> -t markdown` (or the Read tool);
+   `.md`/`.txt` → read directly; a public URL → `WebFetch`. Google Docs /
+   auth-gated sources → ask the user to export to PDF/DOCX or paste the text. If
+   nothing is readable, **stop and ask** — never guess a resume into existence.
+2. **Fill the bundled template — do NOT let a converter generate LaTeX.** Use the
+   existing `master/resume.tex` (the scaffolded ATS template) as the structural
+   base and keep its preamble, custom commands (`\resumeSubheading` / `\resumeItem`),
+   fonts, and layout **untouched**. pandoc's generic LaTeX is not ATS-clean and
+   won't match these commands — only the *content* is ported.
+3. **Map content → sections:** header (name + contact), `SUMMARY`, `EXPERIENCE`
+   (each role = one `\resumeSubheading` + its `\resumeItem` bullets), `KEY
+   ACHIEVEMENTS`, `SKILLS`. Preserve the user's real wording; tighten only for ATS.
+4. **Truthfulness (same bar as everywhere).** Port only what the source actually
+   says. A number you can't read cleanly → `[QUANTIFY: …]`; anything you inferred
+   rather than read → `% UNVERIFIED — confirm true`. Never invent roles, dates, or
+   metrics.
+5. **Show the mapped content and STOP for approval** before writing — this creates
+   the canonical master. On approval, write `master/resume.tex` (content only).
+6. **Compile-validate:** `jobforge-compile master/resume.tex`. An imported resume
+   often spills past one page — the **1-page guard** will flag it; surface it so the
+   user decides what to trim (don't auto-cut).
+7. **Seed the bank (optional, suggested).** The bank's `strong` lines must trace to
+   a file in `master/additional-context/`. Tell the user to drop the original resume
+   file there (it's their source of record), then run **Mode 1** to sweep it into
+   `bullet-bank.md`. (The skill still never writes into `additional-context/` itself.)
+
 ## Truthfulness policy (applies to every mode)
 
 Identical bar to `tailor-application`, raised because this edits the canonical
@@ -136,6 +171,9 @@ résumé:
 
 ## First-run setup
 
+- **No real master yet?** If `master/resume.tex` is missing or still the scaffold
+  template, bootstrap it with **Mode 4** (import an existing PDF/Word resume) or by
+  hand-filling the template — then the other modes apply.
 - If `master/bullet-bank.md` doesn't exist, create it with a one-line header and
   seed it by running Mode 1 over `master/additional-context/`.
 - The compile step reuses `tailor-application`'s toolchain. If `pdflatex` is missing,
