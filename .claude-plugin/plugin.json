@@ -1,7 +1,7 @@
 {
   "name": "jobforge",
   "description": "Job-search toolkit: tailor a LaTeX resume to a posting (ATS gap analysis + 1-page PDF), maintain a master resume + reusable bullet bank, and build a self-contained interview-prep dashboard.",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "author": { "name": "Rohit Kumar" },
   "homepage": "https://github.com/rohit1223/jobforge",
   "repository": "https://github.com/rohit1223/jobforge",

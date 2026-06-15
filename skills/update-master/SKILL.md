@@ -57,6 +57,8 @@ small field block:
 Field rules:
 - **`bullet`** — a single, polished, ATS-clean line written the way it would read in
   the résumé (strong verb, concrete metric, no LaTeX that would break a compile).
+  Keep it simple and impactful: **no em/en dashes or `--`/`---`** (they read as
+  AI-generated — use a period or comma instead) and no filler jargon.
 - **`skills` / `domain`** — the matchable tags; they line up against
   `tailor-application`'s keyword buckets so a job run can rank bank lines by overlap.
 - **`source`** — points at the specific input file (and anchor) the fact came from.

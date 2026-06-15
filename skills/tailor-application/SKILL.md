@@ -12,6 +12,7 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 - **Master (read-only source of truth):** `master/resume.tex`. Never edit it. If absent, the workspace isn't set up — tell the user to run `jobforge-scaffold` (then drop in their résumé, or use update-master's import mode).
 - **Per-application artifacts:** `applications/<Company>_<Role>/` containing `job.md`, `keywords.md`, `gap-report.md`, `resume-tailored.tex`, `resume-tailored.pdf`.
 - `<Company>_<Role>` uses PascalCase, no spaces (e.g. `Acme_DevOpsEngineer`).
+- **Writing style (avoid the AI tell):** write bullets as simple, impactful sentences. Do **not** use em-dashes (—), en-dashes (–), or LaTeX `--`/`---` — heavy dash use reads as AI-generated; use a period or comma and split long sentences. Cut filler buzzwords and convoluted phrasing. Keep the concrete tech keywords ATS needs, but state them plainly. Applies to every rewrite and to cover letters.
 
 ## Workflow
 
