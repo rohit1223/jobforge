@@ -60,7 +60,7 @@ When the user asks for a cover letter, write `applications/<Company>_<Role>/cove
 
 `jobforge-toolchain` checks for `pandoc`, `pdflatex`, and `tlmgr`:
 - Installs `pandoc` via Homebrew automatically (no sudo).
-- BasicTeX and `tlmgr install` need **sudo**, which requires a real TTY. Neither the agent's Bash tool **nor Claude Code's `!` inline prompt** provides one — sudo fails there with "a terminal is required to read the password". So the **one-time BasicTeX install must be run by the user in a real terminal window (Terminal.app / iTerm):** `brew install --cask basictex`. The script attempts it, and on sudo failure prints that instruction and exits with code 2. When you see exit 2, tell the user to run it in an actual terminal app (not the `!` prompt) and wait for them to confirm.
+- BasicTeX and `tlmgr install` need **sudo**, and the Bash tool / `!` prompt have no TTY. The scripts handle this with a bundled **GUI askpass helper** (`scripts/askpass.sh` via `sudo -A`): a macOS password dialog pops up to install BasicTeX / packages, and the credential is cached so follow-on installs don't re-prompt. Only if that dialog is cancelled or unavailable (e.g. a headless/SSH session) do they fall back to printing the manual `brew install --cask basictex` / `sudo tlmgr install` command and exiting with code 2. On exit 2, tell the user to run the printed command in a real terminal and confirm.
 - Once `pdflatex` exists, `jobforge-compile` resolves missing `.sty` files iteratively via `tlmgr search --file`.
 
 ## Formatting audit (one-time, separate from per-job runs)

@@ -26,7 +26,20 @@ export PATH="/Library/TeX/texbin:$PATH"
 command -v pdflatex >/dev/null 2>&1 || { echo "✗ pdflatex not on PATH — run ensure-toolchain.sh first"; exit 1; }
 
 have_tlmgr() { command -v tlmgr >/dev/null 2>&1; }
-sudo_noninteractive() { sudo -n true >/dev/null 2>&1; }
+
+# GUI askpass so sudo works without a TTY (Claude Code's Bash tool / ! prompt have
+# none). On macOS, sudo -A pops a password dialog via askpass.sh.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ASKPASS="$SCRIPT_DIR/askpass.sh"
+[ "$(uname)" = "Darwin" ] && [ -x "$ASKPASS" ] && export SUDO_ASKPASS="$ASKPASS"
+
+# Run sudo non-interactively if a credential is cached, else via the GUI askpass
+# (sudo -A). Non-zero if neither works, so the caller can print manual steps.
+run_sudo() {
+  if sudo -n true 2>/dev/null; then sudo "$@"; return; fi
+  if [ -n "${SUDO_ASKPASS:-}" ]; then SUDO_ASKPASS="$ASKPASS" sudo -A "$@"; return; fi
+  return 1
+}
 
 run_pdflatex() {
   # -interaction=nonstopmode so a missing file fails fast instead of prompting.
@@ -59,18 +72,17 @@ for ((i=1; i<=MAX_TRIES; i++)); do
   pkg="$(tlmgr search --global --file "/$miss" 2>/dev/null | grep -vE '^(tlmgr|search)' | head -1 | cut -d: -f1 | tr -d ' ')"
   pkg="${pkg:-${miss%.*}}"
 
-  if sudo_noninteractive; then
-    sudo tlmgr install "$pkg" >/dev/null 2>&1 || { echo "✗ tlmgr install $pkg failed"; exit 1; }
+  if run_sudo tlmgr install "$pkg" >/dev/null 2>&1; then
     echo "  ✓ installed $pkg"
   else
     cat <<EOF
-✗ Installing LaTeX package '$pkg' (for $miss) needs sudo, which requires a real
-  terminal (Claude Code's '!' prompt has no TTY for sudo). In Terminal.app / iTerm:
+✗ Installing LaTeX package '$pkg' (for $miss) needs sudo. Tried a GUI password
+  prompt (sudo -A askpass) but it didn't go through. In Terminal.app / iTerm:
 
     sudo tlmgr install $pkg
 
   Then re-run the compile. (Tip: a one-time 'sudo chown -R \$(whoami) <texlive-root>'
-  lets the agent install future packages without sudo.)
+  lets future installs skip sudo entirely.)
 
 EOF
     exit 2

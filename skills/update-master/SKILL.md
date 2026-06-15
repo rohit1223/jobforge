@@ -177,5 +177,5 @@ résumé:
 - If `master/bullet-bank.md` doesn't exist, create it with a one-line header and
   seed it by running Mode 1 over `master/additional-context/`.
 - The compile step reuses `tailor-application`'s toolchain. If `pdflatex` is missing,
-  `jobforge-compile` / `jobforge-toolchain` print the one-time BasicTeX install
-  instruction (must run in a real terminal — see tailor-application's SKILL.md).
+  `jobforge-compile` / `jobforge-toolchain` install it via a GUI sudo password
+  dialog (with a real-terminal fallback — see tailor-application's SKILL.md).

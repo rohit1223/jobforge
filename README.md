@@ -67,8 +67,10 @@ keeping the `\resumeSubheading` / `\resumeItem` commands the skills expect.
 jobforge-toolchain
 ```
 
-Installs `pandoc` automatically. BasicTeX needs `sudo`, so if it can't proceed it
-prints the exact `brew install --cask basictex` command to run in a real terminal.
+Installs `pandoc` automatically. BasicTeX + LaTeX packages need `sudo`: a macOS
+password dialog pops up (via a `sudo -A` askpass helper) to install them. If
+there's no GUI session, it prints the exact `brew install --cask basictex`
+command to run in a terminal instead.
 
 ---
 
@@ -158,7 +160,7 @@ the same name.)
 `plugin.json` sets an explicit `version`, so **pushing commits alone won't reach
 users** — Claude Code keeps the cached copy until the version string changes. On
 each release: **bump `version`** in `.claude-plugin/plugin.json` (currently
-`0.2.1`), commit, push. Then users run the update commands above.
+`0.2.2`), commit, push. Then users run the update commands above.
 
 > Iterating fast? Remove the `version` field instead — the plugin then tracks the
 > git commit SHA, so every push is treated as a new version. Add `version` back

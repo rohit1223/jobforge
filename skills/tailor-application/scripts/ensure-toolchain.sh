@@ -16,8 +16,19 @@ need_user_action=0
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# Can we run sudo without an interactive password prompt?
-sudo_noninteractive() { sudo -n true >/dev/null 2>&1; }
+# GUI askpass so sudo works without a TTY (Claude Code's Bash tool / ! prompt have
+# none). On macOS, sudo -A pops a password dialog via askpass.sh.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ASKPASS="$SCRIPT_DIR/askpass.sh"
+[ "$(uname)" = "Darwin" ] && [ -x "$ASKPASS" ] && export SUDO_ASKPASS="$ASKPASS"
+
+# Run sudo non-interactively if a credential is cached, else via the GUI askpass
+# (sudo -A). Non-zero if neither works.
+run_sudo() {
+  if sudo -n true 2>/dev/null; then sudo "$@"; return; fi
+  if [ -n "${SUDO_ASKPASS:-}" ]; then SUDO_ASKPASS="$ASKPASS" sudo -A "$@"; return; fi
+  return 1
+}
 
 # --- pandoc (no sudo) --------------------------------------------------------
 if have pandoc; then
@@ -49,15 +60,17 @@ if have pdflatex; then
 else
   if have brew; then
     echo "→ BasicTeX needs sudo to install its .pkg."
-    if sudo_noninteractive && brew install --cask basictex >/dev/null 2>&1; then
+    # Pre-authorize sudo once (GUI dialog) so brew's own internal sudo runs
+    # non-interactively against the cached credential.
+    if run_sudo -v 2>/dev/null && brew install --cask basictex >/dev/null 2>&1; then
       eval "$(/usr/libexec/path_helper)" 2>/dev/null || true
       export PATH="/Library/TeX/texbin:$PATH"
       echo "✓ BasicTeX installed"
     else
       cat <<'EOF'
-✗ Cannot install BasicTeX without an interactive sudo password.
-  sudo needs a real TTY — Claude Code's `!` prompt does NOT provide one.
-  Open a real terminal window (Terminal.app / iTerm) and run:
+✗ Could not install BasicTeX. Tried a GUI sudo password prompt (sudo -A askpass)
+  but it didn't go through (cancelled, or no GUI session). Open a real terminal
+  (Terminal.app / iTerm) and run:
 
     brew install --cask basictex
 
@@ -71,8 +84,8 @@ EOF
   fi
 fi
 
-# --- tlmgr self-update (best effort, sudo) -----------------------------------
-if have tlmgr && sudo_noninteractive; then
+# --- tlmgr self-update (best effort; only if sudo is already cached, no dialog) ---
+if have tlmgr && sudo -n true 2>/dev/null; then
   sudo tlmgr update --self >/dev/null 2>&1 || true
 fi
 
