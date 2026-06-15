@@ -18,6 +18,22 @@ published.
 
 ---
 
+## Requirements
+
+- **Claude Code** with web access — the skills use WebFetch/WebSearch to read job
+  postings and source documentation.
+- **The Context7 plugin** — **required by `interview-prep`** to ground topics in
+  official library docs. Install it alongside jobforge (step 1 below).
+- **macOS with [Homebrew](https://brew.sh)** for the résumé toolchain.
+  `jobforge-toolchain` then installs the rest for you: **pandoc** + **poppler**
+  (no sudo) and **BasicTeX / LaTeX** (via a GUI sudo prompt). **python3** (ships
+  with macOS) renders the interview-prep dashboard.
+
+Only Context7 and Homebrew need installing yourself; `jobforge-toolchain` handles
+the rest.
+
+---
+
 ## Install
 
 ### 1. Add the plugin
@@ -32,6 +48,17 @@ In Claude Code:
 This puts the three skills and the helper commands (`jobforge-toolchain`,
 `jobforge-compile`, `jobforge-build`) on Claude Code's PATH whenever the plugin is
 enabled — no symlinks, no clone required.
+
+**Then add Context7** — required by `interview-prep` for official-doc grounding:
+
+```
+/plugin install context7@claude-plugins-official
+/reload-plugins
+```
+
+Run `/plugin list` to confirm both `jobforge` and `context7` are enabled. (If
+Context7 isn't found, the official marketplace may need adding first via the
+`/plugin` menu → Discover.)
 
 ### 2. Create your workspace
 
@@ -160,7 +187,7 @@ the same name.)
 `plugin.json` sets an explicit `version`, so **pushing commits alone won't reach
 users** — Claude Code keeps the cached copy until the version string changes. On
 each release: **bump `version`** in `.claude-plugin/plugin.json` (currently
-`0.2.2`), commit, push. Then users run the update commands above.
+`0.2.3`), commit, push. Then users run the update commands above.
 
 > Iterating fast? Remove the `version` field instead — the plugin then tracks the
 > git commit SHA, so every push is treated as a new version. Add `version` back

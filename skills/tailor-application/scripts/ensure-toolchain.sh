@@ -48,6 +48,23 @@ else
   fi
 fi
 
+# --- poppler / pdftotext (no sudo, recommended) ------------------------------
+# Provides pdftotext (ATS keyword-survival check + PDF notes/import) and pdfinfo
+# (page count). Optional: features degrade gracefully without it, so a failure
+# here does not block the toolchain.
+if have pdftotext; then
+  echo "✓ pdftotext present"
+elif have brew; then
+  echo "→ installing poppler (pdftotext/pdfinfo) via Homebrew…"
+  if brew install poppler >/dev/null 2>&1; then
+    echo "✓ poppler installed"
+  else
+    echo "ℹ poppler install failed — run: ! brew install poppler (ATS text check will be skipped)"
+  fi
+else
+  echo "ℹ Homebrew not found — skipping poppler (ATS text check will be skipped)."
+fi
+
 # --- LaTeX engine (sudo) -----------------------------------------------------
 # Make sure a prior basictex install is on PATH for this shell.
 if ! have pdflatex && [ -x /usr/libexec/path_helper ]; then

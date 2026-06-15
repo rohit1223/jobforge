@@ -1,6 +1,6 @@
 ---
 name: interview-prep
-description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (Context7 first). Five modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], add-note, mock <topic|all> (interactive mock interview graded against the topics' model answers), and prep-for <Company_Role> (writes the per-job prep.yml manifest behind the dashboard's job switcher, reusing shared topics across jobs). Use when the user wants to revise/prep for interviews, prep for a specific job/role, deepen or explore a topic, build a study dashboard, be mock-interviewed, or add a note from a link/document. See USAGE.md for the user-facing guide.
+description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives on any topic at a chosen depth. Each topic gets deep mental-model concepts (internals, trade-offs, failure modes, tuning) and seniority-calibrated interview questions as a click-to-reveal self-quiz, all grounded in official docs (via the required Context7 plugin). Five modes: build/refresh (throttled to ~3 topics/run + a suggested backlog), add-topic <name> [--depth=quick|standard|deep], add-note, mock <topic|all> (interactive mock interview graded against the topics' model answers), and prep-for <Company_Role> (writes the per-job prep.yml manifest behind the dashboard's job switcher, reusing shared topics across jobs). Use when the user wants to revise/prep for interviews, prep for a specific job/role, deepen or explore a topic, build a study dashboard, be mock-interviewed, or add a note from a link/document. See USAGE.md for the user-facing guide.
 ---
 
 # interview-prep
@@ -102,7 +102,12 @@ Authoring notes: leave a blank line after `<summary>` and before `</details>` so
 3. Write `applications/<Company_Role>/prep.yml` per the **Job-prep manifest** convention: generated topics get `slug`/`must`/`rank`/`angle` (one line tying *their* stack to the candidate's experience); JD topics with no topic file yet get `slug`/`title`/`rank`/`why` so they appear under "Suggested for this job". If a `prep.yml` already exists, ask before overwriting.
 4. **Rebuild** with `jobforge-build` and tell the user the job is now selectable in the dashboard's job switcher.
 
-## Doc sourcing (Context7 first)
+## Doc sourcing (Context7 required for library docs)
+
+> **Required dependency — the Context7 MCP plugin.** Library/framework topics are
+> grounded in it. If `ToolSearch` surfaces no `context7` tools, stop and tell the
+> user to install it: `/plugin install context7@claude-plugins-official` then
+> `/reload-plugins` (see the README's **Requirements** section).
 
 - **Libraries/frameworks/tools** (Kubernetes, Terraform, AWS, Jenkins, Java…): `ToolSearch` for `context7`, then `resolve-library-id` → `query-docs` for the deep essentials.
 - **Concept topics** (distributed systems, API design, reliability/SRE, RAG): `WebSearch` the authoritative source (e.g. Google SRE book, REST/Richardson, DDIA-style references) then `WebFetch`.
