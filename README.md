@@ -122,6 +122,50 @@ regardless of CWD.)
 
 ---
 
+## Updating the plugin
+
+### If you installed it from the marketplace (normal use)
+
+Pull the maintainer's latest changes:
+
+```
+/plugin marketplace update jobforge      # refresh the listing from the repo
+/plugin update jobforge@jobforge         # update the installed plugin
+/reload-plugins                          # apply in this session (no restart)
+```
+
+- `marketplace update` re-fetches `marketplace.json`; `plugin update` is what
+  actually swaps in the new version; `/reload-plugins` avoids a full restart.
+- You can also do it from the `/plugin` menu → **Installed** tab.
+- **Update everything** you've installed: `/plugin update --scope user`.
+
+### Enable auto-update (optional)
+
+`/plugin` → **Marketplaces** tab → toggle **auto-update** (off by default for
+third-party marketplaces like this one). When on, Claude Code refreshes at startup
+and prompts you to run `/reload-plugins` if anything changed. To disable all
+auto-updating globally: `export DISABLE_AUTOUPDATER=1`.
+
+### If you run it locally (`--plugin-dir`, e.g. you're hacking on it)
+
+No update step needed — you're running the repo directly. `SKILL.md` edits
+hot-reload in-session; after changing `bin/`, manifests, or hooks, run
+`/reload-plugins`. (A local `--plugin-dir` copy also shadows an installed one of
+the same name.)
+
+### Publishing a new version (maintainer)
+
+`plugin.json` sets an explicit `version`, so **pushing commits alone won't reach
+users** — Claude Code keeps the cached copy until the version string changes. On
+each release: **bump `version`** in `.claude-plugin/plugin.json` (currently
+`0.2.1`), commit, push. Then users run the update commands above.
+
+> Iterating fast? Remove the `version` field instead — the plugin then tracks the
+> git commit SHA, so every push is treated as a new version. Add `version` back
+> when you want controlled, semver'd releases.
+
+---
+
 ## Developing / customizing the plugin
 
 To iterate on the skills locally without re-installing on every change, load the
