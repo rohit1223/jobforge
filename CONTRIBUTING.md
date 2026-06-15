@@ -26,7 +26,7 @@ claude --plugin-dir /path/to/jobforge
 
 ```
 .claude-plugin/   plugin.json (manifest) + marketplace.json (single-plugin marketplace)
-bin/              PATH wrappers: jobforge-build / jobforge-compile / jobforge-toolchain
+bin/              PATH wrappers: jobforge-scaffold / jobforge-build / jobforge-compile / jobforge-toolchain
 skills/           the three skills (SKILL.md + USAGE.md + scripts/)
   tailor-application/scripts/   compile-resume.sh, ensure-toolchain.sh, askpass.sh
   interview-prep/scripts/       build.py

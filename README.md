@@ -62,21 +62,21 @@ Context7 isn't found, the official marketplace may need adding first via the
 
 ### 2. Create your workspace
 
-Pick a directory to keep your job search in (it can be its own private git repo).
-Clone or copy this repo's `scaffold.sh` + `examples/` there, or run the bundled
-scaffold, then seed the skeleton:
+Pick a directory to keep your job search in (it can be its own private git repo),
+`cd` into it, and seed the skeleton from the plugin's bundled templates:
 
 ```bash
-bash scaffold.sh            # copies examples/ -> master/, applications/, interview-prep/
+cd ~/path/to/your-job-search
+jobforge-scaffold          # creates master/, applications/, interview-prep/
 ```
 
-It never overwrites existing files. Then **replace `master/resume.tex` with your
-own résumé** (keep the custom commands the template defines — the skills rely on
-them).
+`jobforge-scaffold` is on PATH once the plugin is enabled — no clone needed, and it
+never overwrites existing files. Then **replace `master/resume.tex` with your own
+résumé** (keep the custom commands the template defines — the skills rely on them).
 
 ### Don't have a LaTeX resume?
 
-`scaffold.sh` already gives you a working ATS template at `master/resume.tex`. To
+`jobforge-scaffold` already gives you a working ATS template at `master/resume.tex`. To
 fill it from a resume you already have (PDF, Word, Google Docs export, or plain
 text), drop the file in your workspace and ask Claude Code:
 

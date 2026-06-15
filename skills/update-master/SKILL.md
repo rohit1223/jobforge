@@ -171,8 +171,9 @@ résumé:
 
 ## First-run setup
 
-- **No real master yet?** If `master/resume.tex` is missing or still the scaffold
-  template, bootstrap it with **Mode 4** (import an existing PDF/Word resume) or by
+- **No workspace yet?** If `master/resume.tex` is missing, run `jobforge-scaffold`
+  to create it from the bundled templates. If it's still the scaffold placeholder,
+  bootstrap it with **Mode 4** (import an existing PDF/Word resume) or by
   hand-filling the template — then the other modes apply.
 - If `master/bullet-bank.md` doesn't exist, create it with a one-line header and
   seed it by running Mode 1 over `master/additional-context/`.

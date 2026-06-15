@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# jobforge-scaffold — seed a JobForge workspace in the current directory from the
+# plugin's bundled examples/ (master/, applications/, interview-prep/).
+#
+# Wrapper around the bundled scaffold.sh so it's invokable by bare name when the
+# plugin is enabled — no repo clone needed. scaffold.sh copies from its own
+# sibling examples/ (in the plugin) into the target dir (your CWD by default), and
+# never overwrites existing files. Safe to re-run.
+#
+# Usage: jobforge-scaffold [target-dir]   (defaults to the current directory)
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$here/../scaffold.sh" "$@"

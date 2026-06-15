@@ -9,7 +9,7 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 
 ## Conventions
 
-- **Master (read-only source of truth):** `master/resume.tex`. Never edit it. If absent, stop and ask the user to place it there.
+- **Master (read-only source of truth):** `master/resume.tex`. Never edit it. If absent, the workspace isn't set up — tell the user to run `jobforge-scaffold` (then drop in their résumé, or use update-master's import mode).
 - **Per-application artifacts:** `applications/<Company>_<Role>/` containing `job.md`, `keywords.md`, `gap-report.md`, `resume-tailored.tex`, `resume-tailored.pdf`.
 - `<Company>_<Role>` uses PascalCase, no spaces (e.g. `Acme_DevOpsEngineer`).
 
