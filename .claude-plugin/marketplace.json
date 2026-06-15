@@ -5,7 +5,7 @@
   "plugins": [
     {
       "name": "jobforge",
-      "source": ".",
+      "source": "./",
       "description": "Tailor resumes to job postings, maintain a master resume + bullet bank, and build an interview-prep dashboard.",
       "category": "productivity",
       "keywords": ["resume", "ats", "job-search", "interview-prep"]
