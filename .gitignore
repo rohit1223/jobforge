@@ -30,3 +30,15 @@ master/additional-context/*.pdf
 
 # Python
 __pycache__/
+
+# ---- Your private workspace data (never published) -------------------------
+# The skills read/write these relative to where you launch Claude Code. They are
+# yours alone — recreate the skeleton from examples/ with `bash scaffold.sh`.
+# Anchored to repo root with a leading slash so examples/ stays tracked.
+/master/
+/applications/
+/interview-prep/topics/
+/interview-prep/notes/
+/interview-prep/suggested.md
+/interview-prep/index.html
+/job_description/

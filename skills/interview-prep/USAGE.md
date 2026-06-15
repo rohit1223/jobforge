@@ -52,7 +52,7 @@ analysis — which shared topics matter for *this* role, which are musts, their
 order, and a one-line *angle* per topic (how their stack maps to your
 experience). The dashboard's **job switcher** is driven by these files.
 
-> "prep-for Sensorfact_DevOpsEngineer" · "prep me for the Acme SRE role"
+> "prep-for ExampleCorp_DevOpsEngineer" · "prep me for the Acme SRE role"
 
 Topics are shared across jobs: two roles needing Kubernetes reuse the same
 topic (and your quiz progress on it) — only ordering, musts, angles, and the
@@ -106,18 +106,18 @@ examples. Best for unfamiliar topics; on by default for `learning` topics.
 ## Rebuilding manually
 
 ```
-python3 skills/interview-prep/scripts/build.py interview-prep
+jobforge-build interview-prep
 open interview-prep/index.html
 ```
 
 ## Where things live
 
 ```
-interview-prep/topics/<slug>.md   generated topics (git-tracked)
+interview-prep/topics/<slug>.md   generated topics (your data; gitignored)
 interview-prep/notes/<slug>.md    your notes
 interview-prep/suggested.md       ranked backlog of not-yet-generated topics
 interview-prep/index.html         the built dashboard (gitignored)
-skills/interview-prep/            the skill: SKILL.md, USAGE.md, scripts/build.py
+(the skill itself ships inside the jobforge plugin; `jobforge-build` is on PATH)
 ```
 
 ## Safety

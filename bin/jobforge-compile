@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# jobforge-compile — compile a resume .tex -> ATS-optimized PDF (1-page guard +
+# pdftotext ATS extraction). Wrapper around the bundled compile-resume.sh.
+#
+# Usage: jobforge-compile <path/to/resume.tex>
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$here/../skills/tailor-application/scripts/compile-resume.sh" "$@"

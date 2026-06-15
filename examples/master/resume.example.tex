@@ -1,0 +1,98 @@
+%==============================================================================
+% JobForge master resume template — single-column, ATS-friendly.
+%
+% Replace the placeholder content with your own. KEEP the layout: the skills
+% (tailor-application / update-master) only ever edit CONTENT inside the
+% \section blocks — never the preamble, the custom commands, or the fonts.
+%
+% Custom commands the skills rely on: \resumeSubheading, \resumeItem,
+% \resumeSubHeadingListStart/End, \resumeItemListStart/End, and the SUMMARY /
+% EXPERIENCE / KEY ACHIEVEMENTS / SKILLS sections. Don't rename them.
+%
+% Compile:  jobforge-compile master/resume.tex   (auto-installs missing packages)
+%==============================================================================
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section formatting — uppercase, ruled, ATS-parseable (no multi-column).
+\titleformat{\section}{\vspace{-4pt}\scshape\raggedright\large}{}{0em}{}[\titlerule \vspace{-5pt}]
+
+% ---- Custom commands (do not rename) ----------------------------------------
+\newcommand{\resumeItem}[1]{\item\small{#1 \vspace{-2pt}}}
+
+\newcommand{\resumeSubheading}[4]{%
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\begin{document}
+
+%---------- HEADING ----------
+\begin{center}
+    \textbf{\Huge \scshape Your Name} \\ \vspace{1pt}
+    \small City, Country $|$ +00 000 000 0000 $|$
+    \href{mailto:you@example.com}{you@example.com} $|$
+    \href{https://linkedin.com/in/you}{linkedin.com/in/you} $|$
+    \href{https://github.com/you}{github.com/you}
+\end{center}
+
+%---------- SUMMARY ----------
+\section{Summary}
+Senior engineer with N years of experience in [your domain]. One or two lines
+that name your strongest, most relevant capabilities. Keep it factual — the
+skills will tailor this per job, never invent.
+
+%---------- EXPERIENCE ----------
+\section{Experience}
+\resumeSubHeadingListStart
+
+  \resumeSubheading
+    {Job Title}{Mon YYYY -- Present}
+    {Company Name}{Location}
+    \resumeItemListStart
+      \resumeItem{Strong-verb achievement with a concrete metric (e.g. cut p99 latency 40\%).}
+      \resumeItem{Another result, tied to scope and impact, not responsibilities.}
+    \resumeItemListEnd
+
+  \resumeSubheading
+    {Previous Title}{Mon YYYY -- Mon YYYY}
+    {Previous Company}{Location}
+    \resumeItemListStart
+      \resumeItem{Achievement with measurable outcome.}
+    \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%---------- KEY ACHIEVEMENTS ----------
+\section{Key Achievements}
+\resumeItemListStart
+  \resumeItem{A standout, quantified accomplishment that spans roles.}
+\resumeItemListEnd
+
+%---------- SKILLS ----------
+\section{Skills}
+\small{
+ \textbf{Languages}{: Python, Go, \dots} \\
+ \textbf{Infrastructure}{: Kubernetes, Terraform, AWS, \dots} \\
+ \textbf{Other}{: CI/CD, observability, \dots}
+}
+
+\end{document}

@@ -1,0 +1,22 @@
+# Job-prep manifest — drives the interview-prep dashboard's job switcher.
+# Written by tailor-application (or interview-prep's `prep-for` mode). Generated
+# topics carry slug/must/rank/angle; JD topics with no topic file yet carry
+# slug/title/rank/why and show as "Suggested for this job".
+job: Example Corp — Senior SRE
+topics:
+  - slug: kubernetes
+    must: true
+    rank: 1
+    angle: Tie EKS upgrades + zero-downtime rollouts to their platform reliability ask.
+  - slug: observability
+    must: true
+    rank: 2
+    angle: Prometheus/Grafana SLO dashboards you've built map directly to their stack.
+  - slug: terraform
+    must: false
+    rank: 3
+    angle: Module design + drift detection for their IaC footprint.
+  - slug: chaos-engineering   # not yet generated -> shows under "Suggested for this job"
+    title: Chaos Engineering
+    rank: 4
+    why: JD mentions resilience testing; learn the fundamentals before the loop.

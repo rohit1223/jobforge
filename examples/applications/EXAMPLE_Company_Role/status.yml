@@ -1,0 +1,8 @@
+# Tracker pane source (flat key: value lines — read by a non-YAML parser).
+company: Example Corp
+role: Senior Site Reliability Engineer
+url:
+applied:            # YYYY-MM-DD, fill when actually submitted
+stage: tailored     # tailored | applied | interview | offer | rejected
+next_interview:     # YYYY-MM-DD when scheduled
+notes:

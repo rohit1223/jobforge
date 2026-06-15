@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# jobforge-build — render the interview-prep dashboard.
+# Wrapper around the bundled build.py so it is invokable by bare name from the
+# Bash tool PATH when the jobforge plugin is enabled (CWD-independent).
+#
+# Usage: jobforge-build [datadir]   (datadir defaults to "interview-prep")
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "$here/../skills/interview-prep/scripts/build.py" "$@"

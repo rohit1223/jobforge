@@ -1,157 +1,137 @@
-# Resume — job-tailoring workspace
+# JobForge
 
-A version-controlled system for tailoring a master LaTeX resume to specific job
-postings and producing ATS-optimized PDFs. The logic lives in a Claude Code skill
-(`skills/tailor-application`) that is symlinked into `~/.claude/skills/`, so it's
-tracked in this repo yet discoverable by Claude Code.
+A Claude Code **plugin** for running a job search end to end:
 
-## Layout
+- **`tailor-application`** — point it at a job posting; it does an ATS gap analysis
+  against your résumé, then (after you approve) rewrites a per-job copy and
+  compiles a 1-page PDF. Never edits your master.
+- **`update-master`** — the only skill allowed to touch your master résumé. Turns
+  raw achievements into a reusable, sourced **bullet bank**, and promotes selected
+  lines into `master/resume.tex` behind a hard human gate.
+- **`interview-prep`** — builds a self-contained interview-prep dashboard (one
+  offline HTML page) of senior-level topics drawn from your résumé and job gap
+  reports, with a job switcher, self-quiz, and mock-interview mode.
 
-```
-master/resume.tex                  Canonical resume — edited only by the update-master skill.
-master/bullet-bank.md              Reusable, sourced resume lines (skill-owned; promoted into resume.tex).
-master/additional-context/         Read-only source-of-record dir (brag-docs/.md tracked, promo *.pdf gitignored).
-applications/<Company>_<Role>/     One folder per job, holding generated artifacts:
-  ├── job.md                         the posting (fetched or pasted)
-  ├── keywords.md                    bucketed must-have / nice-to-have keywords
-  ├── gap-report.md                  weighted match score + prioritized edits
-  ├── resume-tailored.tex            master + approved, content-only edits
-  ├── resume-tailored.pdf            compiled output
-  ├── resume-tailored.txt            ATS text extraction (pdftotext) for keyword checks
-  ├── cover-letter.md                optional, on request
-  ├── status.yml                     stage / applied / next_interview (tracker pane)
-  └── prep.yml                       job-prep manifest (drives the dashboard's job switcher)
-interview-prep/                    Global, repo-wide study dashboard (not job-specific):
-  ├── topics/<slug>.md               one per topic (derived from keywords + gaps)
-  ├── notes/<slug>.md                one per note (from a URL or local doc)
-  └── index.html                     generated self-contained SPA (gitignored)
-skills/
-  ├── install.sh                     symlinks skills/* into ~/.claude/skills
-  ├── tailor-application/            resume↔job tailoring skill
-  ├── update-master/                 master-resume + bullet-bank skill
-  └── interview-prep/                interview-prep dashboard + notes skill
-```
+The plugin ships the **tools**. Your résumé, applications, and prep content are
+**your data** — they live in a workspace directory that is gitignored and never
+published.
 
-## Setup
+---
 
-```bash
-# 1. Make the skill discoverable by Claude Code (idempotent; safe to re-run)
-bash skills/install.sh
+## Install
 
-# 2. Install the LaTeX/PDF toolchain (pandoc auto; BasicTeX needs your password)
-bash skills/tailor-application/scripts/ensure-toolchain.sh
-```
-
-`ensure-toolchain.sh` installs `pandoc` automatically. BasicTeX and `tlmgr`
-package installs need `sudo` (a real password prompt) — the script prints the
-exact command to run if it can't proceed.
-
-## Usage
-
-In Claude Code, point the skill at a job:
-
-> Tailor my resume to https://jobs.example.com/some-role
-
-The skill runs a two-phase pipeline with a human gate in the middle:
-
-1. **Analysis** — fetch the posting → extract keywords → score the resume →
-   write `gap-report.md`. *Stops here for you to review.*
-2. **Rewrite + compile** (after you approve) — conversational per-edit triage →
-   write `resume-tailored.tex` (content only, never the layout) → compile to PDF
-   with a 1-page guard.
-
-### Ground rules baked into the skill
-
-- **Master is never edited** — only a per-application copy is rewritten.
-- **No fabrication** — edits re-surface true facts; any gap-fill bullet is tagged
-  `% UNVERIFIED` and needs explicit approval; missing numbers become `[QUANTIFY: …]`.
-- **Layout is untouched per job** — fonts/columns/margins are handled as a
-  separate one-time audit of the master, not on every run.
-
-## Compiling manually
-
-```bash
-export PATH="/Library/TeX/texbin:$PATH"
-bash skills/tailor-application/scripts/compile-resume.sh \
-  applications/<Company>_<Role>/resume-tailored.tex
-```
-
-The compile script auto-installs any missing LaTeX packages via `tlmgr` and warns
-if the result spills past one page.
-
-## Updating the master resume
-
-`tailor-application` never edits the master. A second skill, `update-master`, is the
-**only** thing that does — behind a hard human gate. It turns your raw achievements
-into résumé bullets through a staging bank:
-
-```
-master/additional-context/   ── you drop true source material here (md + promo PDFs)
-        │   sweep            (skill reads the whole dir, writes none of it)
-        ▼
-master/bullet-bank.md        ── structured, reusable, tagged bullets (each cites its source)
-        │   promote          (you approve the exact LaTeX edit; compile-validated, 1-page guard)
-        ▼
-master/resume.tex            ── canonical résumé
-```
-
-Three modes, in Claude Code:
-
-> update my master resume            # sweep additional-context/ → propose bank entries → show diff
-> add this achievement: …            # paste/URL → a new (emerging) bank entry
-> promote the CSRF line to my resume # gated: shows the LaTeX edit, writes resume.tex, recompiles
-
-Ground rules: only facts present in `master/additional-context/` reach the bank as
-`strong`; unsourced/asserted lines are `emerging` and can't be promoted; a missing
-number is `[QUANTIFY: …]` and blocks promotion; the master is compile-validated on
-every promote (a broken master would poison future tailor runs). Bank lines that stay
-`in_master: false` are a reservoir — `tailor-application` can pull one for a specific
-job without ever changing the master.
-
-## Interview prep
-
-A second skill, `interview-prep`, builds a single self-contained SPA
-(`interview-prep/index.html`) for **senior-level revision of topics you can
-defend**. One skill, five modes:
-
-- **Build / refresh** — derives matched, resume-proven topics (JD-required
-  first), sources official docs (Context7 first, WebSearch+Fetch fallback), and
-  writes deep prep per topic: senior mental-model concepts (internals,
-  trade-offs, failure modes, tuning) + 10–15 seniority-calibrated interview
-  questions as a **click-to-reveal self-quiz** + "say it with your resume" hooks.
-- **Add a topic** (`add-topic <name> [--depth] [--detailed]`) — any single
-  topic on demand, matched strength or gap you're learning.
-- **Add a note** — point it at a public URL or local doc; it 80/20-distills the
-  source into a note section.
-- **Mock interview** (`mock <topic|all>`) — get interviewed in chat, one
-  question at a time, graded against the model answers, with a weak-areas log.
-- **Prep for a job** (`prep-for <Company_Role>`) — writes the per-job
-  `prep.yml` manifest (topics, musts, order, one-line angles) behind the
-  dashboard's **job switcher**.
-
-The dashboard itself has a **job switcher** (pick a role to see only its
-topics, must-first in its own order, with job-specific angle callouts and a
-job-scoped quiz — shared topics reuse one content file and one progress store
-across jobs), tracks **self-quiz progress** (grade each answer; stored in
-localStorage), runs **shuffled quiz / weak-only flashcard sessions**, has
-full-content search, keyboard navigation, a printable cheat-sheet mode, a
-mobile drawer layout, staleness hints on old topics, and an **Applications
-tracker** pane fed by `applications/*/status.yml` (stage + next-interview
-countdown).
+### 1. Add the plugin
 
 In Claude Code:
 
-> Build my interview prep dashboard
-> add-topic ClickHouse --detailed
-> mock me on Kafka
-> Add a note from https://…
-
-Each `.md` lives under `interview-prep/`; the build renders them to one HTML page:
-
-```bash
-python3 skills/interview-prep/scripts/build.py interview-prep
-open interview-prep/index.html
+```
+/plugin marketplace add rohit1223/jobforge      # or the git URL of this repo
+/plugin install jobforge@jobforge
 ```
 
-Refreshes are **additive** — new topics are added, hand-edited files and notes
-are never clobbered (tracked via a `generated:` frontmatter flag).
+This puts the three skills and the helper commands (`jobforge-toolchain`,
+`jobforge-compile`, `jobforge-build`) on Claude Code's PATH whenever the plugin is
+enabled — no symlinks, no clone required.
+
+### 2. Create your workspace
+
+Pick a directory to keep your job search in (it can be its own private git repo).
+Clone or copy this repo's `scaffold.sh` + `examples/` there, or run the bundled
+scaffold, then seed the skeleton:
+
+```bash
+bash scaffold.sh            # copies examples/ -> master/, applications/, interview-prep/
+```
+
+It never overwrites existing files. Then **replace `master/resume.tex` with your
+own résumé** (keep the custom commands the template defines — the skills rely on
+them).
+
+### 3. Install the LaTeX toolchain (one-time)
+
+```
+jobforge-toolchain
+```
+
+Installs `pandoc` automatically. BasicTeX needs `sudo`, so if it can't proceed it
+prints the exact `brew install --cask basictex` command to run in a real terminal.
+
+---
+
+## Use
+
+Launch Claude Code **from your workspace directory** (see the CWD note below), then
+just ask:
+
+```
+Tailor my resume to https://jobs.example.com/some-role
+update my master resume
+add this achievement: <paste a brag-doc line or URL>
+promote the RAG line to my resume
+Build my interview prep dashboard
+add-topic Kafka --detailed
+mock me on Kubernetes
+prep-for Acme_SeniorSRE
+```
+
+`tailor-application` runs a two-phase pipeline with a human gate: **analysis**
+(fetch → keywords → gap report, *stops for review*) → **rewrite + compile** after
+you approve.
+
+---
+
+## How your data is laid out
+
+Everything below is created by `scaffold.sh` / the skills and is **gitignored** —
+it stays on your machine:
+
+```
+master/resume.tex                  Your résumé. Edited only by update-master.
+master/bullet-bank.md              Reusable, sourced résumé lines (skill-owned).
+master/additional-context/         Drop true source material here (brag-docs, promo PDFs).
+applications/<Company>_<Role>/      One folder per job (job.md, keywords.md, gap-report.md,
+                                     resume-tailored.{tex,pdf,txt}, status.yml, prep.yml).
+interview-prep/topics/<slug>.md    One per study topic.
+interview-prep/notes/<slug>.md     One per note.
+interview-prep/index.html          The generated dashboard (gitignored).
+```
+
+The tracked, publishable parts of this repo are: `skills/`, `bin/`, `examples/`,
+`scaffold.sh`, the `.claude-plugin/` manifests, and this README.
+
+### The CWD contract
+
+The skills resolve `master/`, `applications/`, and `interview-prep/` **relative to
+the directory you launch Claude Code from**. Always run it from your workspace
+root. (The bundled helper commands resolve their own bundled scripts, so they work
+regardless of CWD.)
+
+---
+
+## Developing / customizing the plugin
+
+To iterate on the skills locally without re-installing on every change, load the
+repo as a live plugin directory:
+
+```bash
+claude --plugin-dir /path/to/jobforge
+```
+
+Edits to `SKILL.md` files reload in-session; after changing `bin/`, hooks, or
+manifests, run `/reload-plugins`.
+
+---
+
+## Ground rules baked into the skills
+
+- **No fabrication.** Edits only re-surface facts already true; any gap-fill bullet
+  is tagged `% UNVERIFIED` and needs explicit approval; missing numbers become
+  `[QUANTIFY: …]`. A bank line can't be `strong` (or promotable) unless it traces
+  to a real file in `master/additional-context/`.
+- **The master is sacred.** Only `update-master` writes `master/resume.tex`, behind
+  a gate, compile-validated, with a 1-page guard. `tailor-application` never touches
+  it — it rewrites a per-application copy.
+- **Layout is untouched per job.** Fonts/columns/margins are a one-time audit of the
+  master, never changed on a per-job run.
+- **Additive interview-prep refreshes.** New topics are added; hand-edited files and
+  notes are never clobbered (tracked via a `generated:` frontmatter flag).

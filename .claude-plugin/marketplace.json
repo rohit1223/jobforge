@@ -1,0 +1,14 @@
+{
+  "name": "jobforge",
+  "owner": { "name": "Rohit Kumar" },
+  "description": "JobForge — resume tailoring, master-resume maintenance, and interview prep as Claude Code skills.",
+  "plugins": [
+    {
+      "name": "jobforge",
+      "source": ".",
+      "description": "Tailor resumes to job postings, maintain a master resume + bullet bank, and build an interview-prep dashboard.",
+      "category": "productivity",
+      "keywords": ["resume", "ats", "job-search", "interview-prep"]
+    }
+  ]
+}

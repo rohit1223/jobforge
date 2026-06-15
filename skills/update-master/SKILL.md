@@ -32,8 +32,8 @@ trace to a real source in `master/additional-context/`. No fabrication, ever.
 - **Bank (skill-owned):** `master/bullet-bank.md`. Structured entries (schema below).
   Git-tracked; the user may hand-edit but normally doesn't.
 - **Master (high-stakes, gated):** `master/resume.tex`. Written only by *promote*.
-- **Compile script (reused, not duplicated):**
-  `skills/tailor-application/scripts/compile-resume.sh`.
+- **Compile command (bundled, reused):** `jobforge-compile` (on PATH while the
+  plugin is enabled; wraps tailor-application's compile script).
 
 ## Bullet-bank schema
 
@@ -113,7 +113,7 @@ on the master".
 3. On approval, **write `master/resume.tex`** (content only — never the preamble,
    packages, fonts, or layout) and flip the entry's `in_master: true`.
 4. **Compile-validate:** run
-   `bash skills/tailor-application/scripts/compile-resume.sh master/resume.tex`.
+   `jobforge-compile master/resume.tex`.
    This proves the master still compiles (a broken master poisons every future
    tailor run) and fires the **1-page guard**. If it spills past one page, surface
    it immediately so the user decides what to cut. `master/resume.pdf` is a
@@ -139,5 +139,5 @@ résumé:
 - If `master/bullet-bank.md` doesn't exist, create it with a one-line header and
   seed it by running Mode 1 over `master/additional-context/`.
 - The compile step reuses `tailor-application`'s toolchain. If `pdflatex` is missing,
-  `compile-resume.sh` / `ensure-toolchain.sh` print the one-time BasicTeX install
+  `jobforge-compile` / `jobforge-toolchain` print the one-time BasicTeX install
   instruction (must run in a real terminal — see tailor-application's SKILL.md).

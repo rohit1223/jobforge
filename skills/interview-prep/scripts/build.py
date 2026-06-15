@@ -65,8 +65,8 @@ def parse_list(v):
 def collect_companies(jobs):
     """Company-level rollup derived from the per-job prep.yml manifests.
 
-    Company key = the dir prefix before the first '_' (e.g. Booking_SRE_II →
-    'Booking'). Returns: comp_topics {company: {slug: {must, rank}}} (rank = min
+    Company key = the dir prefix before the first '_' (e.g. Acme_SRE_II →
+    'Acme'). Returns: comp_topics {company: {slug: {must, rank}}} (rank = min
     across that company's roles, must = any role marks it), topic_comp {slug:
     set(company)} for the per-topic tag chips, and comp_label {company: display}.
     """

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# jobforge-toolchain — ensure the resume toolchain (pandoc + LaTeX) is present.
+# Wrapper around the bundled ensure-toolchain.sh.
+#
+# Usage: jobforge-toolchain
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec bash "$here/../skills/tailor-application/scripts/ensure-toolchain.sh" "$@"
