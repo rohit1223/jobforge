@@ -35,6 +35,7 @@ __pycache__/
 # The skills read/write these relative to where you launch Claude Code. They are
 # yours alone — recreate the skeleton from examples/ with `bash scaffold.sh`.
 # Anchored to repo root with a leading slash so examples/ stays tracked.
+/.jobforge.yml
 /master/
 /applications/
 /interview-prep/topics/

@@ -31,6 +31,32 @@ done < <(find "$SRC" -type f -print0)
 # Ensure the empty working dirs the skills write into exist.
 mkdir -p "$DST/interview-prep/notes" "$DST/interview-prep/topics"
 
+# --- Capture your name for deliverable filenames (<Name>_<RoleAbbr>_resume.pdf) -
+# tailor-application reads this to name PDFs. Defaults to the resume heading; falls
+# back to the heading (or asks) at tailoring time if this file is absent.
+CFG="$DST/.jobforge.yml"
+if [ ! -e "$CFG" ]; then
+  default_name="$(grep -hoE '\\Huge[^}]+' "$DST/master/resume.tex" 2>/dev/null \
+                  | head -1 | sed -E 's/\\Huge[[:space:]]*//; s/[[:space:]]+$//')"
+  name=""
+  if [ -t 0 ]; then
+    printf "Your full name (used to name resume PDFs)%s: " "${default_name:+ [$default_name]}"
+    read -r entered || true
+    name="${entered:-$default_name}"
+  fi
+  if [ -n "$name" ] && [ "$name" != "Your Name" ]; then
+    {
+      echo "# JobForge workspace config (personal; gitignored)."
+      echo "# Read by the tailor-application skill to name deliverable resume PDFs"
+      echo "# <Name>_<RoleAbbr>_resume.pdf (e.g. RohitKumar_SSDE_resume.pdf)."
+      echo "name: $name"
+    } > "$CFG"
+    echo "✓ created:       .jobforge.yml (name: $name)"
+  else
+    echo "• .jobforge.yml not set — add 'name: Your Name' to it, or tailor-application will ask."
+  fi
+fi
+
 echo ""
 echo "Done — $copied created, $skipped skipped."
 echo "Next: replace master/resume.tex with your own resume, then ask Claude Code"

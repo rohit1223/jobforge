@@ -2,7 +2,10 @@
 # Compile a tailored resume .tex -> .pdf, auto-installing missing LaTeX packages,
 # and warn if the result exceeds one page.
 #
-# Usage: compile-resume.sh <path/to/resume-tailored.tex>
+# Usage: compile-resume.sh <path/to/resume-tailored.tex> [output-basename]
+#   output-basename (optional): name the deliverable PDF/txt, e.g.
+#   "RohitKumar_SSDE_resume" -> RohitKumar_SSDE_resume.pdf + .txt in the same dir.
+#   Omitted -> the PDF/txt keep the .tex basename (back-compatible).
 #
 # Exit codes:
 #   0  PDF produced (check stdout for a >1-page warning)
@@ -16,7 +19,9 @@ TEX="${1:?usage: compile-resume.sh <file.tex>}"
 
 DIR="$(cd "$(dirname "$TEX")" && pwd)"
 BASE="$(basename "$TEX" .tex)"
-PDF="$DIR/$BASE.pdf"
+OUTBASE="${2:-$BASE}"      # optional deliverable name (e.g. RohitKumar_SSDE_resume)
+TEXPDF="$DIR/$BASE.pdf"    # what pdflatex writes (from $BASE.tex)
+PDF="$DIR/$OUTBASE.pdf"    # final deliverable path (== TEXPDF when no override)
 LOG="$DIR/$BASE.log"
 
 # Put a possible BasicTeX on PATH for this shell.
@@ -61,7 +66,7 @@ for ((i=1; i<=MAX_TRIES; i++)); do
   if [ -z "$miss" ]; then
     echo "✗ compile failed (not a missing-package error). Last log lines:"
     tail -25 "$LOG" 2>/dev/null
-    rm -f "$PDF"
+    rm -f "$TEXPDF"
     exit 1
   fi
 
@@ -92,7 +97,12 @@ done
 # Run twice more so section rules / refs settle.
 run_pdflatex >/dev/null 2>&1 || true
 
-[ -f "$PDF" ] || { echo "✗ no PDF produced. Log tail:"; tail -25 "$LOG"; exit 1; }
+[ -f "$TEXPDF" ] || { echo "✗ no PDF produced. Log tail:"; tail -25 "$LOG"; exit 1; }
+
+# Rename to the requested deliverable name, if one was given.
+if [ "$OUTBASE" != "$BASE" ]; then
+  mv -f "$TEXPDF" "$PDF"
+fi
 
 # --- 1-page guard ------------------------------------------------------------
 pages=""
@@ -121,7 +131,7 @@ fi
 # --- ATS text extraction -------------------------------------------------------
 # Emit the text an ATS would parse so keyword survival can be verified.
 if command -v pdftotext >/dev/null 2>&1; then
-  TXT="$DIR/$BASE.txt"
+  TXT="$DIR/$OUTBASE.txt"
   if pdftotext -layout "$PDF" "$TXT" 2>/dev/null; then
     echo "✓ ATS text extraction: $TXT — verify MUST keywords survived"
   else

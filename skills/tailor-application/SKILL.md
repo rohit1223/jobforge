@@ -10,8 +10,11 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 ## Conventions
 
 - **Master (read-only source of truth):** `master/resume.tex`. Never edit it. If absent, the workspace isn't set up — tell the user to run `jobforge-scaffold` (then drop in their résumé, or use update-master's import mode).
-- **Per-application artifacts:** `applications/<Company>_<Role>/` containing `job.md`, `keywords.md`, `gap-report.md`, `resume-tailored.tex`, `resume-tailored.pdf`.
+- **Per-application artifacts:** `applications/<Company>_<Role>/` containing `job.md`, `keywords.md`, `gap-report.md`, `resume-tailored.tex` (working source), and the deliverable PDF named `<UserName>_<RoleAbbr>_resume.pdf` (plus its `.txt`).
 - `<Company>_<Role>` uses PascalCase, no spaces (e.g. `Acme_DevOpsEngineer`).
+- **Deliverable filename:** the compiled PDF is `<UserName>_<RoleAbbr>_resume.pdf` (underscore-separated). The working `.tex` stays `resume-tailored.tex` in every app (uniform, easy to find and edit).
+  - `UserName`: read `name:` from `.jobforge.yml` at the workspace root; if absent, derive from the master resume heading (`\Huge <name>`); if still unknown, ask. Strip to a filename-safe form (remove spaces and punctuation), e.g. `Rohit Kumar` → `RohitKumar`.
+  - `RoleAbbr`: a short abbreviation of the job **designation only** (drop team/specialization qualifiers). Use an initialism for multiword titles and keep well-known forms. E.g. `Sr. Software Development Engineer` → `SSDE`; `DevOps Engineer` → `DevOps`; `Site Reliability Engineer II` → `SRE2`; `Sr. Software Engineer, Core Services` → `SSE`. Record it as `role_abbr` in `status.yml`.
 - **Writing style (avoid the AI tell):** write bullets as simple, impactful sentences. Do **not** use em-dashes (—), en-dashes (–), or LaTeX `--`/`---` — heavy dash use reads as AI-generated; use a period or comma and split long sentences. Cut filler buzzwords and convoluted phrasing. Keep the concrete tech keywords ATS needs, but state them plainly. Applies to every rewrite and to cover letters.
 
 ## Workflow
@@ -34,12 +37,14 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
 
 6. **Per-edit triage, conversationally.** Walk proposed edits with the user in batches (old→new, why, flags). **Truthfulness policy:** only re-surface facts already true; you MAY draft a bullet for a real gap but tag it `% UNVERIFIED — confirm true` and require explicit per-edit approval. Never silently invent. Numbers you don't have become `[QUANTIFY: …]`. **Bank as reservoir:** when a must-have is uncovered, prefer proposing a `strong` bank line from `master/bullet-bank.md` (its `bullet` text is already sourced and truth-checked, so it doesn't need `% UNVERIFIED`) over inventing — these are the off-master lines (`in_master: false`) meant for exactly this. Adding a bank line to this one application does **not** modify the master or the bank; permanently adopting it is a separate `update-master` promote.
 7. **Write `resume-tailored.tex`** = copy of master + approved edits. **Content only** — never touch the preamble, packages, fonts, or layout.
-8. **Ensure toolchain, then compile:** run `jobforge-toolchain` then `jobforge-compile <dir>/resume-tailored.tex` (both are on PATH while the plugin is enabled). See **Toolchain** below. The compile script auto-installs missing LaTeX packages, reverts to no PDF on error, and **warns if the PDF exceeds 1 page**.
-9. **ATS self-check.** The compile script extracts `resume-tailored.txt` from the PDF via `pdftotext` (the text an ATS actually parses). Verify every MUST keyword from `keywords.md` appears in it, case-insensitively; list any that didn't survive (e.g. lost in a glyph/ligature) so they can be re-worded. If `pdftotext` is unavailable the script prints the `brew install poppler` hint — note the check was skipped.
+8. **Ensure toolchain, then compile:** run `jobforge-toolchain` then `jobforge-compile <dir>/resume-tailored.tex <UserName>_<RoleAbbr>_resume` (both are on PATH while the plugin is enabled). The 2nd arg names the deliverable, producing `<dir>/<UserName>_<RoleAbbr>_resume.pdf` (and matching `.txt`); omitting it falls back to the `.tex` basename. See **Toolchain** below. The compile script auto-installs missing LaTeX packages, reverts to no PDF on error, and **warns if the PDF exceeds 1 page**.
+9. **ATS self-check.** The compile script extracts `<UserName>_<RoleAbbr>_resume.txt` from the PDF via `pdftotext` (the text an ATS actually parses). Verify every MUST keyword from `keywords.md` appears in it, case-insensitively; list any that didn't survive (e.g. lost in a glyph/ligature) so they can be re-worded. If `pdftotext` is unavailable the script prints the `brew install poppler` hint — note the check was skipped.
 10. **Write `status.yml`** in the application dir — flat `key: value` lines only (a non-YAML parser reads it):
     ```yaml
     company: <Company>
     role: <Role>
+    role_abbr: <RoleAbbr>                          # used in the deliverable filename
+    resume_pdf: <UserName>_<RoleAbbr>_resume.pdf   # the compiled deliverable
     url: <posting url or empty>
     applied:            # YYYY-MM-DD, fill when actually submitted
     stage: tailored     # tailored | applied | interview | offer | rejected
@@ -47,7 +52,7 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
     notes:
     ```
     The interview-prep dashboard renders these files as an **Applications tracker** pane (with a next-interview countdown). The user updates `stage`/`next_interview` by hand or by asking.
-11. **Report** the final score, the diff summary, the PDF path, the ATS-check result, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
+11. **Report** the final score, the diff summary, the deliverable PDF path (`<UserName>_<RoleAbbr>_resume.pdf`), the ATS-check result, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
 
 ## Cover letter (optional, on request)
 
