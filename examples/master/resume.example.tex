@@ -23,7 +23,6 @@
 \usepackage{fancyhdr}
 \usepackage[english]{babel}
 \usepackage{tabularx}
-\usepackage{fontawesome5}
 \usepackage[scale=0.90,lf]{FiraMono}
 \usepackage{contour}
 \usepackage[normalem]{ulem}
@@ -105,10 +104,13 @@
 %----------HEADING----------
 \begin{center}
     \textbf{\Huge Your Name} \\ \vspace{5pt}
-    \small \faPhone*\ \texttt{+1-000-000-0000} \hspace{1pt} $|$
-    \hspace{1pt} \faEnvelope\ \texttt{you@example.com} \hspace{1pt} $|$
-    \hspace{1pt} \faLinkedin\ \href{https://www.linkedin.com/in/you}{\texttt{@you}} \hspace{1pt} $|$
-    \hspace{1pt} \faGithub\ \href{https://github.com/you}{\texttt{@you}} \hspace{1pt} \\ \vspace{-3pt}
+    % Plain-text contact line: icon glyphs extract as junk bytes in pdftotext/ATS
+    % parsers, and URLs hidden behind \href anchor text never reach the extracted
+    % text. Keep the visible text a full, parseable URL.
+    \small \texttt{+1-000-000-0000} \hspace{1pt} $|$
+    \hspace{1pt} \texttt{you@example.com} \hspace{1pt} $|$
+    \hspace{1pt} \href{https://www.linkedin.com/in/you}{\texttt{linkedin.com/in/you}} \hspace{1pt} $|$
+    \hspace{1pt} \href{https://github.com/you}{\texttt{github.com/you}} \hspace{1pt} \\ \vspace{-3pt}
 \end{center}
 
 %-----------SUMMARY-----------
