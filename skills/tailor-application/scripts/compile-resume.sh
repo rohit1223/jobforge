@@ -10,6 +10,8 @@
 # Exit codes:
 #   0  PDF produced (check stdout for a >1-page warning)
 #   2  a missing package needs sudo tlmgr install (commands printed for the user)
+#   3  contact block failed ATS extraction (junk bytes, or email/profile URLs
+#      missing from the extracted text); PDF kept so the header can be inspected
 #   1  compile failed for another reason (log tail printed); no PDF kept
 
 set -uo pipefail
@@ -130,14 +132,53 @@ fi
 
 # --- ATS text extraction -------------------------------------------------------
 # Emit the text an ATS would parse so keyword survival can be verified.
-if command -v pdftotext >/dev/null 2>&1; then
-  TXT="$DIR/$OUTBASE.txt"
-  if pdftotext -layout "$PDF" "$TXT" 2>/dev/null; then
-    echo "✓ ATS text extraction: $TXT — verify MUST keywords survived"
-  else
-    echo "ℹ pdftotext failed; skipping ATS text extraction."
-  fi
-else
+if ! command -v pdftotext >/dev/null 2>&1; then
   echo "ℹ pdftotext not found — 'brew install poppler' to enable the ATS text check."
+  exit 0
 fi
+
+TXT="$DIR/$OUTBASE.txt"
+rm -f "$TXT"   # never leave a stale extraction backing the ATS self-check
+if ! pdftotext -layout "$PDF" "$TXT" 2>/dev/null; then
+  echo "✗ pdftotext failed — no ATS text produced, keyword survival cannot be verified."
+  exit 1
+fi
+echo "✓ ATS text extraction: $TXT — verify MUST keywords survived"
+
+# --- Contact-block extraction check --------------------------------------------
+# An ATS builds the candidate profile from the header. Two shipped failure modes
+# this guards against: icon glyphs that extract as junk/control bytes, and profile
+# URLs that live only in \href targets (invisible to text extraction). The visible
+# header text must carry the real email and full profile URLs.
+HEADER="$(head -5 "$TXT")"
+contact_fail=0
+
+# Control bytes: C0 controls (minus tab/newline/CR), DEL, and UTF-8-encoded C1
+# controls (\xc2\x80-\x9f — the icon-glyph residue). Accented names (\xc3+) pass.
+# Range starts at \x01: bash cannot pass a NUL byte in an argument anyway.
+if printf '%s' "$HEADER" | LC_ALL=C grep -q -e $'[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]' -e $'\xc2[\x80-\x9f]'; then
+  echo "✗ contact block: non-printable junk bytes in the extracted header (icon glyphs?)."
+  contact_fail=1
+fi
+
+if ! printf '%s' "$HEADER" | grep -Eq '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'; then
+  echo "✗ contact block: no email address in the extracted header."
+  contact_fail=1
+fi
+
+# Require each profile URL in the extracted text only if the .tex links to it —
+# otherwise the URL exists solely as an \href target an ATS never sees.
+for domain in 'linkedin.com/in/' 'github.com/'; do
+  if grep -q "$domain" "$TEX" && ! printf '%s' "$HEADER" | grep -q "$domain"; then
+    echo "✗ contact block: $domain is linked in the .tex but absent from the extracted header — make the visible link text the full URL."
+    contact_fail=1
+  fi
+done
+
+if [ "$contact_fail" -ne 0 ]; then
+  echo "✗ contact check FAILED — an ATS cannot reliably build the candidate profile from this header. Extracted header:"
+  printf '%s\n' "$HEADER" | cat -v | sed 's/^/    /'
+  exit 3
+fi
+echo "✓ contact block extracts cleanly (email + profile URLs present, no junk bytes)"
 exit 0
