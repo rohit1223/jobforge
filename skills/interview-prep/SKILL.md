@@ -1,11 +1,11 @@
 ---
 name: interview-prep
-description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and the matched keywords of job gap reports, plus on-demand deep dives at a chosen depth. Topics combine doc-grounded concepts and self-quiz questions (Context7 plugin required) with real interview questions scouted from Glassdoor, AmbitionBox, LinkedIn, Blind, Reddit and similar sites. Five modes: build/refresh, add-topic <name> [--depth=quick|standard|deep], add-note, mock <topic|all>, and prep-for <Company_Role> (natural trigger "do interview prep for <job_name>"). Never runs as a side effect of resume tailoring; it is always invoked explicitly. Use when the user wants to revise/prep for interviews, prep for a specific job or company, be mock-interviewed, deepen a topic, add a note, or asks for real interview questions asked at a company. See USAGE.md for the user-facing guide.
+description: Build and grow a self-contained interview-prep dashboard (single SPA HTML) for SENIOR-level revision of topics you can defend, drawn from your resume and job gap reports, plus on-demand deep dives. Topics combine doc-grounded concepts and self-quiz questions (Context7 plugin required) with real interview questions scouted from Glassdoor, AmbitionBox, LinkedIn, Blind, Reddit and similar sites. Six modes: build/refresh, add-topic <name> [--depth=quick|standard|deep], add-note, mock <topic|all>, real-qna <topic> [--depth] (real-world questions only, no docs, calibrated to the candidate's total experience; trigger "quick prep <topic>"), and prep-for <Company_Role> (natural trigger "do interview prep for <job_name>"). Never runs as a side effect of resume tailoring; it is always invoked explicitly. Use when the user wants to revise/prep for interviews, prep for a specific job or company, be mock-interviewed, deepen a topic, add a note, or wants only real interview questions for a topic or company. See USAGE.md.
 ---
 
 # interview-prep
 
-A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, five modes:** build/refresh the dashboard, add a topic, add a note, a mock interview, and `prep-for` (a per-job manifest powering the dashboard's job switcher).
+A global, repo-wide study dashboard that complements `tailor-application`. Its job is **deep revision of matched, defensible topics** — the things your resume already proves and the role needs — at a level suited to a senior/staff engineer (9+ years). **One skill, six modes:** build/refresh the dashboard, add a topic, add a note, a mock interview, `prep-for` (a per-job manifest powering the dashboard's job switcher), and `real-qna` (real-world questions only, for quick prep by topic name).
 
 > **Explicit invocation only.** This skill never runs as a side effect of `tailor-application`; tailoring a resume writes nothing under `interview-prep/` and no `prep.yml`.
 > The user starts prep separately, e.g. "do interview prep for <job_name>" (Mode 5) or "build my interview prep dashboard" (Mode 1).
@@ -28,6 +28,9 @@ A global, repo-wide study dashboard that complements `tailor-application`. Its j
 - **Job-prep manifest:** `applications/<Company>_<Role>/prep.yml` — `job:` display name + `topics:` list of entries `slug`, `must` (bool), `rank` (int), `angle` (one-line job-specific framing shown as a callout in that job's view); not-yet-generated entries carry `title` + `why` and appear as "Suggested for this job". The dashboard's job switcher is driven entirely by these files; the All view aggregates them (must in any job, min rank).
 - **Note frontmatter:** `title`, `source` (url/path), `added` (YYYY-MM-DD), `generated: true`.
 - **Suggested backlog:** `interview-prep/suggested.md` — a ranked markdown list `- Title — one-line why` of matched topics not yet generated. The build renders it as a muted "Suggested · not generated" sidebar group; Mode 1 maintains it.
+- **Experience calibration:** whenever questions are calibrated, derive the candidate's total years of experience once per run: `experience_years:` from `.jobforge.yml` if present, else the span since the earliest role date in `master/resume.tex`; if neither resolves, ask.
+  Bands: `<3` junior (fundamentals, hands-on usage), `3-7` mid (mechanisms, trade-offs, debugging), `8+` senior/staff (design, incidents, judgment calls; this skill's default voice).
+  The band governs which questions to keep and how deep the model answers go; drop recall trivia below the band.
 - **Depth tiers** (control concept richness + question count + number of doc fetches):
   | tier | questions | concepts | fetches |
   |---|---|---|---|
@@ -64,7 +67,8 @@ Senior mental-model, cited throughout. Cover, with real depth:
 - **Tuning knobs** — the few config/levers that matter at scale.
 
 ## Interview questions
-10-15 questions calibrated for 9+ years (NO "what is X" recall). Mix:
+10-15 questions calibrated to the candidate's band per **Experience calibration**
+(senior default: NO "what is X" recall). Mix:
 mechanism/"why & what breaks", trade-off/comparison, debugging/incident scenarios,
 1-2 system-design prompts, and 1-2 experience questions tied to the resume.
 Each as a click-to-reveal self-quiz block:
@@ -116,6 +120,20 @@ Authoring notes: leave a blank line after `<summary>` and before `</details>` so
 5. Write `applications/<Company_Role>/prep.yml` per the **Job-prep manifest** convention: generated topics get `slug`/`must`/`rank`/`angle` (one line tying *their* stack to the candidate's experience); JD topics with no topic file yet get `slug`/`title`/`rank`/`why` so they appear under "Suggested for this job". If a `prep.yml` already exists, ask before overwriting.
 6. **Scout real interview questions** for this company and role per **Real interview questions** below, writing `notes/real-questions-<company>-<role>.md`. This step is required, not optional; skip it only if every search comes back empty, and say so.
 7. **Rebuild** with `jobforge-build` and tell the user the job is now selectable in the dashboard's job switcher, plus where the real-questions note landed.
+
+## Mode 6 — real-world Q&A only  (`real-qna <topic> [--depth=quick|standard|deep]` · "quick prep <topic>")
+
+Fast prep on one named topic using ONLY community-reported questions: no Core concepts section, no Context7 or official-doc sourcing, zero doc fetches.
+Run this mode when the user asks for "just real questions", "quick prep on <topic>", or "real-world QnA for <topic>".
+The natural phrase "quick prep <topic>" implies `--depth=quick`; a bare `real-qna <topic>` defaults to `standard`.
+
+1. **Calibrate to experience** per **Experience calibration** (Conventions); select questions for that band and pitch every model answer at it.
+2. **Scout** per **Real interview questions** using the topic-level query shapes, preferring recent reports. Question counts by depth: `quick` ~5, `standard` ~10, `deep` ~15-20.
+3. **Answer + attribute.** Same `<details>` self-quiz format; every question tagged with its reported source; model answers written by you, concise at `quick` (2-4 sentences), fuller at `deep`. Never fabricate a question or a source; if searches come up short, deliver what is real and say so.
+4. **Deliver in chat first** - that is the quick prep - then persist and rebuild:
+   - if `topics/<slug>.md` exists, merge the new questions into its `## Real-world questions` section (dedupe against existing ones; respect the never-clobber rail for edited files);
+   - else write `notes/real-qna-<slug>.md` (frontmatter: `title`, `source` listing the sites used, `added`, `generated: true`).
+5. If the user then wants the full mental-model treatment, point them to `add-topic <topic>` - do not silently upgrade this run into one.
 
 ## Doc sourcing (Context7 required for library docs)
 
