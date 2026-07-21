@@ -5,7 +5,7 @@ reports. Senior-level revision of topics you can defend, plus on-demand deep
 dives on any topic. Everything renders into one offline HTML page:
 `interview-prep/index.html`.
 
-## The five modes
+## The six modes
 
 ### 1. Build / refresh the dashboard
 Derives **matched, résumé-proven** topics (JD-required first), and generates the
@@ -64,6 +64,26 @@ you start prep with this command whenever you are ready.
 Topics are shared across jobs: two roles needing Kubernetes reuse the same
 topic (and your quiz progress on it) — only ordering, musts, angles, and the
 job's suggested gaps differ.
+
+### 6. Real-world Q&A only  (`real-qna`)
+Fast prep on one topic by name: only questions people report actually being
+asked (Glassdoor, AmbitionBox, LinkedIn, Blind, Reddit, and similar), with no
+docs and no theory build-up.
+The skill reads your **total experience** from your resume and pitches both the
+question selection and the answers to that band (junior / mid / senior).
+
+> "quick prep on Kafka" · "real-qna Redis --depth=deep" · "just real interview questions for Terraform"
+
+| Tier | Questions |
+|------|-----------|
+| `quick` | ~5 |
+| `standard` *(default)* | ~10 |
+| `deep` | ~15-20 |
+
+Saying "quick prep" implies the `quick` tier.
+Answers land in chat first, then are saved to the dashboard - merged into the
+topic's **Real-world questions** section if the topic already exists, else as a
+note under **Notes**.
 
 ## Depth tiers
 

@@ -44,6 +44,7 @@ Tailor my resume to https://jobs.example.com/some-role
 update my master resume
 Build my interview prep dashboard
 mock me on Kubernetes
+quick prep on Kafka
 do interview prep for Acme_SeniorSRE
 ```
 
