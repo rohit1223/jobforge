@@ -46,13 +46,20 @@ answer with specific feedback, and a session log of weak areas saved under
 
 - Defaults to 8 questions; `all` weights sampling toward `must`/`learning` topics.
 
-### 5. Prep for a specific job  (`prep-for`)
-Creates `applications/<Company>_<Role>/prep.yml` from that job's keyword
-analysis — which shared topics matter for *this* role, which are musts, their
-order, and a one-line *angle* per topic (how their stack maps to your
-experience). The dashboard's **job switcher** is driven by these files.
+### 5. Prep for a specific job  (`prep-for` / "do interview prep for <job>")
+One command does the whole per-job prep.
+It creates `applications/<Company>_<Role>/prep.yml` from that job's keyword
+analysis (which shared topics matter for *this* role, which are musts, their
+order, and a one-line *angle* per topic), adds the job's missing topics to the
+**Suggested** backlog, and scours the web (Glassdoor, AmbitionBox, LinkedIn,
+Blind, Reddit, and similar) for **real interview questions** asked at that
+company, saved as a note. The dashboard's **job switcher** is driven by these
+files.
 
-> "prep-for ExampleCorp_DevOpsEngineer" · "prep me for the Acme SRE role"
+> "do interview prep for ExampleCorp_DevOpsEngineer" · "prep-for Acme_SRE" · "prep me for the Acme SRE role"
+
+Interview prep never runs while you tailor a resume - tailoring stays fast, and
+you start prep with this command whenever you are ready.
 
 Topics are shared across jobs: two roles needing Kubernetes reuse the same
 topic (and your quiz progress on it) — only ordering, musts, angles, and the
@@ -101,6 +108,10 @@ examples. Best for unfamiliar topics; on by default for `learning` topics.
   defend yet), and the depth tier (`quick`/`standard`/`deep`).
 - **Questions** are **click-to-reveal**: read the question, think, then expand
   the model answer. Use it as an active self-quiz.
+- **Real-world questions** - topics carry a community-sourced section of
+  questions people report actually being asked (each tagged with the site it
+  was reported on); per-job prep also saves a company-specific real-questions
+  note under **Notes**.
 - Every topic **cites its official source** at the top.
 
 ## Rebuilding manually

@@ -4,7 +4,7 @@ A Claude Code plugin that runs a job search end to end, with three skills:
 
 - **`tailor-application`** runs an ATS gap analysis of your résumé against a job posting, then compiles a tailored 1-page PDF on your approval. It never edits your master.
 - **`update-master`** is the only skill that edits your master résumé. It turns achievements into a reusable bullet bank and promotes them behind a human gate.
-- **`interview-prep`** builds an offline interview-prep dashboard (topics, self-quiz, mock interviews) from your résumé and job gaps.
+- **`interview-prep`** builds an offline interview-prep dashboard (topics, self-quiz, mock interviews) from your résumé and job gaps, including real interview questions scoured from Glassdoor, AmbitionBox, LinkedIn and similar sites. It runs only when you ask (e.g. `do interview prep for <job>`), never as part of tailoring.
 
 The plugin ships the tools. Your résumé and job data stay in a local, gitignored workspace and are never published.
 
@@ -44,7 +44,7 @@ Tailor my resume to https://jobs.example.com/some-role
 update my master resume
 Build my interview prep dashboard
 mock me on Kubernetes
-prep-for Acme_SeniorSRE
+do interview prep for Acme_SeniorSRE
 ```
 
 `tailor-application` stops after the gap report for your review, then rewrites and compiles on approval.
