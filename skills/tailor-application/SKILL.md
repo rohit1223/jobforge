@@ -32,10 +32,10 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
    If still empty/blocked, **stop and ask the user to paste the job text** — never write a placeholder/garbage `job.md`. Save the full posting verbatim to `job.md`.
 2. **Extract keywords** → `keywords.md`. Bucket into **tech / soft / experience / domain / certs**; tag each **MUST** (job says "required", "X+ years") vs **nice** ("preferred", "no need to be an expert"). Mark each present/absent in the resume.
 3. **Gap report** → `gap-report.md`. Compute a **weighted match score** (must-haves heavy), show **per-bucket coverage**, list strengths to surface and a **prioritized edit list**. Flag genuine gaps `⚠️ CONFIRM` and missing numbers `[QUANTIFY: …]`. **Consult the bullet bank:** if `master/bullet-bank.md` exists, for any must-have not covered by a current master bullet, check whether a bank line (matched via its `skills:`/`domain:` tags, `strength: strong` only) covers it — if so, note in the gap report "bank line available: `<heading>`" rather than calling it an unfillable gap.
-4. **Feed interview-prep.** If `interview-prep/` exists (skip silently otherwise):
-   - Append a `## From <Company> (<Role>)` section to `interview-prep/suggested.md` listing this JD's important keywords as ranked `- Title — one-line why` items (the format the interview-prep build parses): matched, resume-proven keywords are revision candidates; genuine gaps get a "(gap — learn)" suffix. Skip topics already in `interview-prep/topics/` (compare slugs) or already listed anywhere in `suggested.md`.
-   - Write `applications/<Company>_<Role>/prep.yml` — the job-prep manifest behind the dashboard's job switcher (schema in interview-prep's SKILL.md): map keywords to existing topic slugs with judgment (alias-aware); JD must-tier ⇒ `must: true`; rank by JD weight; add a one-line `angle:` per generated topic tying their stack to the resume; entries without a topic file get `title` + `why`. Ask before overwriting an existing `prep.yml`.
-5. **Stop and present the report.** Phase 1 may be the whole job.
+4. **No interview prep during tailoring.** Never write to `interview-prep/` or create `applications/<Company>_<Role>/prep.yml` in a tailoring run; that work slows tailoring down and belongs to the interview-prep skill.
+   The user starts it separately with "do interview prep for <Company>_<Role>" (interview-prep Mode 5), which builds the job's prep manifest and scouts real interview questions.
+   Your only job here is to mention that follow-up in the reports (steps 5 and 11).
+5. **Stop and present the report.** Phase 1 may be the whole job. Close with the interview-prep pointer: `do interview prep for <Company>_<Role>` when they are ready.
 
 ### Phase 2 — Rewrite + compile (only after approval)
 
@@ -57,6 +57,7 @@ Tailors `master/resume.tex` to one job and emits an ATS-optimized PDF. **Two pha
     ```
     The interview-prep dashboard renders these files as an **Applications tracker** pane (with a next-interview countdown). The user updates `stage`/`next_interview` by hand or by asking.
 11. **Report** the final score, the diff summary, the deliverable PDF path (`<UserName>_<RoleAbbr>_resume.pdf`), the ATS-check result, and any `UNVERIFIED`/`QUANTIFY` markers the user must still resolve.
+    Remind the user of the separate follow-up: `do interview prep for <Company>_<Role>`.
 
 ## Cover letter (optional, on request)
 
